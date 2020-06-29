@@ -2,6 +2,8 @@ import logic.function.basic
 
 open function
 
+--functions!
+
 lemma left {α: Type} (f g : α → α)
   (hf : involutive f) (hfg : left_inverse g f) : f = g := 
   begin
