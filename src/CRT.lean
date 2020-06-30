@@ -24,10 +24,10 @@ begin
     split; 
     refl,
 
-    intro H, 
+    intro H,
     have H' : n ≤ m ∧ m ≤ n,
     begin
-        rcases H with ⟨H1, H2⟩, 
+        /-rcases H with ⟨H1, H2⟩, 
         split, 
         cases H2 with d Hd, 
         cases d, 
@@ -41,7 +41,8 @@ begin
         rw Hd,
         rw succ_eq_add_one,
         sorry,
-        sorry, 
+        sorry, -/
+        sorry,
     end,
     linarith, 
 end
@@ -55,6 +56,8 @@ begin
     rw val_cast_nat M2 at hb1, 
     have H'' : (M1 % M2).gcd M2 = M1.gcd M2, 
     begin
+        -- want to show (M1 % M2).gcd M2 ∣ M1.gcd M2
+        
         sorry,
     end,
     --rw [H'', H] at hb2, 
@@ -70,8 +73,9 @@ begin
     use (a1*b1*M2 + a2*b2*M1),
     split,  
     {
-        rw ← add_zero a1, --can we change to just do right side? 
-        apply modeq_add, 
+        rw ← add_zero a1,
+        --conv {to_rhs, skip, rw ← add_zero a1}, --applies to just what we see as RHS
+        apply modeq_add,
         simp only [add_zero],
         rw ← mul_one a1, 
         rw mul_assoc, 
@@ -100,6 +104,7 @@ end
 theorem CRTwith2unique (x1 x2 a1 a2 M1 M2: ℕ) (H: coprime M1 M2) 
     (H1: modeq M1 x1 a1 ∧ modeq M2 x1 a2) (H2: modeq M1 x2 a1 ∧ modeq M2 x2 a2): modeq (M1*M2) x1 x2:=
 begin
-    sorry,
+    rw modeq_iff_dvd,
+    sorry, 
 end
 
