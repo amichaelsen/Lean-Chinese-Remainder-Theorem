@@ -49,18 +49,22 @@ end
 
 lemma nat_inv (M1 M2: ℕ ) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
 begin
-    let b1 := (M2 : zmod M1)⁻¹,
+    --let b1 := (M2 : zmod M1)⁻¹,
     have hb1 := mul_inv_eq_gcd (M2: zmod M1),  
     have H' := coprime.symm H,
     unfold coprime at *, 
     rw val_cast_nat M2 at hb1, 
-    have H'' : (M1 % M2).gcd M2 = M1.gcd M2, 
+    have H'' : (M2 % M1).gcd M1 = M2.gcd M1, 
     begin
         -- want to show (M1 % M2).gcd M2 ∣ M1.gcd M2
         
         sorry,
     end,
-    --rw [H'', H] at hb2, 
+    rw [H'',H'] at hb1, 
+
+    use (M2 : zmod M1)⁻¹.val,
+    --how to translate this to zmod M1? 
+    apply mod
     sorry, 
 end  
 
@@ -87,7 +91,7 @@ begin
         simp only [dvd_mul_left, zero_sub, int.coe_nat_zero, dvd_neg, int.coe_nat_mul], 
     },
     {
-        rw ← zero_add a2, --can we change to just do right side? 
+        rw ← zero_add a2, 
         apply modeq_add, 
         rw modeq_iff_dvd,
         simp only [dvd_mul_left, zero_sub, int.coe_nat_zero, dvd_neg, int.coe_nat_mul],
@@ -119,4 +123,23 @@ begin
     exact ⟨H3, H4⟩, 
     exact H, 
 end
+
+--PLAYING WITH DEFINING CONGRUENCES
+
+
+def congruence := list (Σ (n:ℕ), zmod n)
+
+def ct := Σ (n:ℕ), zmod n
+
+def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
+
+
+def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
+
+-- how to check all modulus are coprime 
+
+--def pairwise_coprime 
+
+#check list.pairwise (λ (x y : ct), nat.coprime x.1 y.1) y 
+
 
