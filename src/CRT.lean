@@ -55,9 +55,10 @@ begin
     rw val_cast_nat M2 at hb1, 
     have H'' : (M1 % M2).gcd M2 = M1.gcd M2, 
     begin
-        
+        sorry,
     end,
-    --rw [H'', H] at hb2,  
+    --rw [H'', H] at hb2, 
+    sorry, 
 end  
 
 theorem CRTwith2exist (a1 a2 M1 M2: ℕ ) (H: coprime M1 M2) : ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
