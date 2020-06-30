@@ -15,6 +15,37 @@ open nat nat.modeq zmod
 
 -- 2 congruence statements
 
+lemma eq_iff_dvd_dvd {n m : ℕ } (hn: n ≠ 0) (hm: m ≠ 0): 
+                     n = m  ↔ m ∣ n ∧ n ∣ m :=
+begin
+    split, 
+    intro H, 
+    rw H, 
+    split; 
+    refl,
+
+    intro H, 
+    have H' : n ≤ m ∧ m ≤ n,
+    begin
+        rcases H with ⟨H1, H2⟩, 
+        split, 
+        cases H2 with d Hd, 
+        cases d, 
+
+        -- zero case
+        exfalso, 
+        rw mul_zero at Hd,
+        exact hm Hd, 
+
+        --d+1 case
+        rw Hd,
+        rw succ_eq_add_one,
+        sorry,
+        sorry, 
+    end,
+    linarith, 
+end
+
 lemma nat_inv (M1 M2: ℕ ) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
 begin
     let b1 := (M2 : zmod M1)⁻¹,
@@ -24,7 +55,7 @@ begin
     rw val_cast_nat M2 at hb1, 
     have H'' : (M1 % M2).gcd M2 = M1.gcd M2, 
     begin
-        sorry,
+        
     end,
     --rw [H'', H] at hb2,  
 end  
