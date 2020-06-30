@@ -2,6 +2,7 @@ import data.nat.basic
 import data.nat.modeq
 import data.nat.gcd
 import data.zmod.basic
+import tactic
 
 open nat nat.modeq zmod 
 
@@ -16,18 +17,16 @@ open nat nat.modeq zmod
 
 lemma nat_inv (M1 M2: ℕ ) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
 begin
-    sorry,
-     /-let b1 := (M2 : zmod M1)⁻¹,
-    let b2 := (M1 : zmod M2)⁻¹,
-    have hb1 := mul_inv_eq_gcd (M2: zmod M1), 
-    have hb2 := mul_inv_eq_gcd (M1: zmod M2), 
+    let b1 := (M2 : zmod M1)⁻¹,
+    have hb1 := mul_inv_eq_gcd (M2: zmod M1),  
+    have H' := coprime.symm H,
     unfold coprime at *, 
-    rw val_cast_nat M1 at hb2, 
-    have H' : (M1 % M2).gcd M2 = M1.gcd M2, 
+    rw val_cast_nat M2 at hb1, 
+    have H'' : (M1 % M2).gcd M2 = M1.gcd M2, 
     begin
         sorry,
     end,
-    rw [H', H] at hb2, -/  
+    --rw [H'', H] at hb2,  
 end  
 
 theorem CRTwith2exist (a1 a2 M1 M2: ℕ ) (H: coprime M1 M2) : ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
