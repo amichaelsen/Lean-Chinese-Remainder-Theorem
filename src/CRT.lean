@@ -104,7 +104,19 @@ end
 theorem CRTwith2unique (x1 x2 a1 a2 M1 M2: ℕ) (H: coprime M1 M2) 
     (H1: modeq M1 x1 a1 ∧ modeq M2 x1 a2) (H2: modeq M1 x2 a1 ∧ modeq M2 x2 a2): modeq (M1*M2) x1 x2:=
 begin
-    rw modeq_iff_dvd,
-    sorry, 
+    --cosntruct separate modular equations
+    have H3 : x1 ≡ x2 [MOD M1],
+    begin
+        exact modeq.trans H1.left (modeq.symm H2.left),
+    end,
+    have H4 : x1 ≡ x2 [MOD M2],
+    begin
+        exact modeq.trans H1.right (modeq.symm H2.right),
+    end,
+
+    -- combine modular equations using coprime
+    rw ← modeq_and_modeq_iff_modeq_mul, 
+    exact ⟨H3, H4⟩, 
+    exact H, 
 end
 
