@@ -17,8 +17,8 @@ open nat nat.modeq zmod euclidean_domain
 
 -- 2 congruence statements
 
-lemma eq_iff_dvd_dvd {n m : ℕ } (hn: n ≠ 0) (hm: m ≠ 0): 
-                     n = m  ↔ m ∣ n ∧ n ∣ m :=
+lemma eq_iff_dvd_dvd {n m : ℕ } --(hn: n ≠ 0) (hm: m ≠ 0) : 
+                    : n = m  ↔ m ∣ n ∧ n ∣ m :=
 begin
     split, 
     intro H, 
@@ -27,9 +27,29 @@ begin
     refl,
 
     intro H,
-    have H' : n ≤ m ∧ m ≤ n,
+    cases H with H1 H2,
+    cases H1 with c hc,
+    cases H2 with d hd,
+    rw hd,
+    rw hc at hd,
+    induction m with x hx,  
+    rw zero_mul at hc,
+    rw hc,
+    ring,
+
+    rw mul_assoc at hd,
+    have hd': x.succ*(c*d)=x.succ,
+        linarith,
+    rw mul_right_eq_self_iff at hd',
+    have h: d=1,
+        rw mul_eq_one_iff at hd',
+        exact hd'.2,
+    rw h,
+    ring,
+    exact succ_pos',
+    /-have H' : n ≤ m ∧ m ≤ n,
     begin
-        /-rcases H with ⟨H1, H2⟩, 
+        rcases H with ⟨H1, H2⟩, 
         split, 
         cases H2 with d Hd, 
         cases d, 
@@ -43,10 +63,11 @@ begin
         rw Hd,
         rw succ_eq_add_one,
         sorry,
-        sorry, -/
+        sorry, 
         sorry,
     end,
-    linarith, 
+    linarith,
+    -/ 
 end
 
 lemma nat_inv (M1 M2: ℕ ) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
@@ -82,7 +103,7 @@ begin
         rw nat.dvd_add_right (f3) at f4,
         have div1:=  dvd_gcd f4 f2,
 
-        
+
 
         
     end,
