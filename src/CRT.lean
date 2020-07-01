@@ -100,9 +100,10 @@ begin
                 exact k, 
             exact dvd_gcd f4 f1,         
         end,
-
-        rw ← eq_iff_dvd_dvd ⟨div1, div2⟩, 
-        
+        have div : M2.gcd M1 ∣ (M2 % M1).gcd M1 ∧ (M2 % M1).gcd M1 ∣ M2.gcd M1, 
+            exact ⟨div1, div2⟩,
+        rw ← eq_iff_dvd_dvd at div,
+        exact div, 
     end,
     rw [H'',H'] at hb1, 
 
