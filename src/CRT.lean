@@ -127,9 +127,10 @@ end
 --PLAYING WITH DEFINING CONGRUENCES
 
 
-def congruence := list (Σ (n:ℕ), zmod n)
 
 def ct := Σ (n:ℕ), zmod n
+
+def congruence := list ct 
 
 def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
 
@@ -142,4 +143,10 @@ def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
 
 #check list.pairwise (λ (x y : ct), nat.coprime x.1 y.1) y 
 
+#check (list.pairwise (≠) [1,2]) 
 
+example {l : list ℕ} (H: list.pairwise (≠) l) : true := 
+begin
+    induction l with a b, 
+    sorry,
+end
