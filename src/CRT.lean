@@ -3,8 +3,10 @@ import data.nat.modeq
 import data.nat.gcd
 import data.zmod.basic
 import tactic
+import algebra.euclidean_domain
+import data.int.basic
 
-open nat nat.modeq zmod 
+open nat nat.modeq zmod euclidean_domain 
 
 
 --  inverses mod n 
@@ -57,8 +59,32 @@ begin
     have H'' : (M2 % M1).gcd M1 = M2.gcd M1, 
     begin
         -- want to show (M1 % M2).gcd M2 ∣ M1.gcd M2
+        have qr := div_add_mod (M2:ℤ) (M1:ℤ ),
+        have f1: M2.gcd M1 ∣ M2 ,
+            exact gcd_dvd_left M2 M1,
+        have f2: M2.gcd M1 ∣ (M1),
+            exact gcd_dvd_right M2 M1,
+        have f3: M2.gcd M1 ∣ M1 *(M2/M1),
+            cases f2 with c hc,
+            use c*(M2/M1),
+            rw ← mul_assoc,
+            rw ← hc,
+        have qr':  (M1 * (M2 / M1) + M2 % M1) = M2,
+            rw ← int.coe_nat_div M2 M1 at qr,
+            rw ← int.coe_nat_mod M2 M1 at qr,
+            rw ← int.coe_nat_mul _ _ at qr,
+            rw ← int.coe_nat_add _ _ at qr,
+            rw int.coe_nat_inj' at qr,
+            exact qr,
+        have f4: M2.gcd M1∣ M1 * (M2 / M1) + M2 % M1,
+            rw qr',
+            exact f1,
+        rw nat.dvd_add_right (f3) at f4,
+        have div1:=  dvd_gcd f4 f2,
+
         
-        sorry,
+
+        
     end,
     rw [H'',H'] at hb1, 
 
