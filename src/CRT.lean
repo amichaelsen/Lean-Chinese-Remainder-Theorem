@@ -192,16 +192,34 @@ end
 --PLAYING WITH DEFINING CONGRUENCES
 
 
+--DEFINITIONS 
 
-def ct := Σ (n:ℕ), zmod n
+def cong := (Σ (n:ℕ), zmod (n+1))
 
-def congruence := list ct 
+def congruences := list cong
+
+def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong), nat.coprime x.1 y.1) l
+
+--def nonzero_cong (l : congruences) : Prop := list.all (λ (x:cong), x.1 > 0) l, --need bool form of x.1 > 0
+--EXAMPLES
 
 def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
 
-
 def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
 
+
+--"inductive"
+--DEFINE INDUCTIVE STRUCTURE ON LISTS OF CONGRUENCES (base case = 2 congruences)
+
+ -- HOW DO BOOLEANS WORK IN LEAN? 
+theorem CRT (l : congruences) (H: pairwise_coprime l) : false := 
+begin
+    sorry, 
+end
+
+
+
+/-
 -- how to check all modulus are coprime 
 
 --def pairwise_coprime 
@@ -215,3 +233,4 @@ begin
     induction l with a b, 
     sorry,
 end
+-/
