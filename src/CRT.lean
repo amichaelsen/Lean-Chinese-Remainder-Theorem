@@ -43,7 +43,20 @@ begin
     exact succ_pos',
 end
 
-lemma nat_inv (M1 M2: ℕ ) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
+
+lemma wrapper_for_cast_val {M1 : ℕ} (nonzero: fact (0 < M1)) (b : zmod M1) : ((b.val) : zmod M1) = b :=
+begin
+    exact cast_val b,
+        --rw cast_val ((M2  : zmod M1)⁻¹: zmod M1),
+        --rw ← cast_val ((M2  : zmod M1)⁻¹: zmod M1) at hb1,
+        --rw [← cast_val     ((u * u⁻¹ : units (zmod (n+1)) ) : zmod (n+1))],
+  
+        --rw cast_val ((M2: zmod M1)⁻¹),
+        --exact nonzero, 
+end
+
+
+lemma nat_inv (M1 M2: ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
 begin
     -- first cast to Z/M1 Z and get the group inverse 
     have hb1 := mul_inv_eq_gcd (M2: zmod M1),  
@@ -103,16 +116,29 @@ begin
     -- use coprimeness and equality of gcd's to get as an actual inverse
     rw [H'',H'] at hb1, 
 
+    
     use (M2 : zmod M1)⁻¹.val,
-    --how to translate this to zmod M1? 
-    sorry, 
+    --translate this to zmod M1
+    rw ← nat_coe_eq_nat_coe_iff _ _ _, 
+
+    simp at *,
+    rw mul_comm,
+    have fact : (((M2: zmod M1)⁻¹.val) : zmod M1)=(M2: zmod M1)⁻¹,
+    begin
+        exact wrapper_for_cast_val M1pos ((M2: zmod M1)⁻¹ : zmod M1), 
+        --rw ← cast_val ((M2  : zmod M1)⁻¹: zmod M1) at hb1, --WHY DOESNT THIS WORK??
+    end,
+    rw fact,
+    exact hb1, 
 end  
 
-theorem CRTwith2exist (a1 a2 M1 M2: ℕ ) (H: coprime M1 M2) : ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
+
+
+theorem CRTwith2exist (a1 a2 M1 M2: ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2) : ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
 begin
     -- get modulo inveres from lemma above
-    cases nat_inv M1 M2 H with b1 Hb1, 
-    cases nat_inv M2 M1 (coprime.symm H) with b2 Hb2, 
+    cases nat_inv M1 M2 M1pos M2pos H with b1 Hb1, 
+    cases nat_inv M2 M1 M2pos M1pos (coprime.symm H) with b2 Hb2, 
     --solution x = a1 b1 m2 + a2 b1 m2 
     use (a1*b1*M2 + a2*b2*M1),
     split,  
@@ -144,7 +170,7 @@ begin
     }
 end
 
-theorem CRTwith2unique (x1 x2 a1 a2 M1 M2: ℕ) (H: coprime M1 M2) 
+theorem CRTwith2unique (x1 x2 a1 a2 M1 M2: ℕ)  (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2) 
     (H1: modeq M1 x1 a1 ∧ modeq M2 x1 a2) (H2: modeq M1 x2 a1 ∧ modeq M2 x2 a2): modeq (M1*M2) x1 x2:=
 begin
     --cosntruct separate modular equations
