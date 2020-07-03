@@ -43,7 +43,7 @@ begin
     exact succ_pos',
 end
 
-
+/-
 lemma wrapper_for_cast_val {M1 : ℕ} (nonzero: fact (0 < M1)) (b : zmod M1) : ((b.val) : zmod M1) = b :=
 begin
     exact cast_val b,
@@ -54,7 +54,7 @@ begin
         --rw cast_val ((M2: zmod M1)⁻¹),
         --exact nonzero, 
 end
-
+-/
 
 lemma nat_inv (M1 M2: ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
 begin
@@ -123,10 +123,11 @@ begin
 
     simp at *,
     rw mul_comm,
-    have fact : (((M2: zmod M1)⁻¹.val) : zmod M1)=(M2: zmod M1)⁻¹,
+
+    have fact : (((M2: zmod M1)⁻¹.val) : zmod M1) = (M2: zmod M1)⁻¹,
     begin
-        exact wrapper_for_cast_val M1pos ((M2: zmod M1)⁻¹ : zmod M1), 
-        --rw ← cast_val ((M2  : zmod M1)⁻¹: zmod M1) at hb1, --WHY DOESNT THIS WORK??
+        --exact wrapper_for_cast_val M1pos ((M2: zmod M1)⁻¹ : zmod M1), 
+        rw @cast_val _ M1pos ((M2  : zmod M1)⁻¹: zmod M1), --need the '@' to make fact explicity 
     end,
     rw fact,
     exact hb1, 
