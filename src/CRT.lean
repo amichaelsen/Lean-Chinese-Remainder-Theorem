@@ -238,6 +238,9 @@ def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), mode
 --DEFINE INDUCTIVE STRUCTURE ON LISTS OF CONGRUENCES (base case = 2 congruences)
 
  -- HOW DO BOOLEANS WORK IN LEAN? 
+theorem CRT (l : congruences) (H: pairwise_coprime l) : ∃ x:ℕ list.all l (λ c:cong, modeq c.1 x c.2 ) := 
+begin
+    induction l with nil full,
 theorem CRT (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
                  ∃ x : ℕ, solution x l := 
 begin
@@ -267,7 +270,7 @@ begin
             exact H_coprime.right,
         end,
     },
-
+    
 end
 
 
