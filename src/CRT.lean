@@ -195,7 +195,7 @@ end
 
 --DEFINITIONS 
 
-def cong := (Σ (n:ℕ), zmod (n+1))
+def cong := (Σ (n:ℕ), zmod n)
 
 def congruences := list cong
 
@@ -204,18 +204,70 @@ def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong)
 --def nonzero_cong (l : congruences) : Prop := list.all (λ (x:cong), x.1 > 0) l, --need bool form of x.1 > 0
 --EXAMPLES
 
+
+
 def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
 
 def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
 
 
+
+--TOY EXAMPLE 
+
+def nonzero_list (l : list ℕ) : Prop := list.all l (λ n, modeq 10 n 1)
+
+
+lemma test {l : list ℕ} (H : nonzero_list l) : modeq 10 l.head 1 := 
+    begin
+        unfold nonzero_list at H, 
+        rw list.all_iff_forall_prop at H, 
+        specialize H l.head,
+        have k : l.head ∈ l, 
+        begin
+            sorry,
+        end, 
+    end
+
+
+
+def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c: cong), 0 < c.1)  
+
+def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), modeq c.1 x c.2.val)
+
 --"inductive"
 --DEFINE INDUCTIVE STRUCTURE ON LISTS OF CONGRUENCES (base case = 2 congruences)
 
  -- HOW DO BOOLEANS WORK IN LEAN? 
-theorem CRT (l : congruences) (H: pairwise_coprime l) : false := 
+theorem CRT (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
+                 ∃ x : ℕ, solution x l := 
 begin
-    sorry, 
+    induction l with cong1 other_congs ind_hyp, 
+    { --null cases with empty list, use x=1 since any x is a "solution"
+        unfold solution,
+        use 1,
+        rw list.all_nil (λ (c:cong), modeq c.1 1 c.2.val),
+        simp only [bool.coe_sort_tt],        
+    },
+    {--inductive case
+        have congs_nonzero : nonzero_cong other_congs, 
+        begin
+            unfold nonzero_cong at *, 
+            rw list.all_iff_forall_prop at *, 
+            intros c hc, 
+            have sub_list : c ∈ list.cons cong1 other_congs, 
+            begin
+                by exact list.mem_cons_of_mem cong1 hc,
+            end,
+            exact H_nonzero c sub_list,
+        end,
+        have congs_pairwise_coprime : pairwise_coprime other_congs,
+        begin
+            unfold pairwise_coprime at *,
+            rw list.pairwise_cons at H_coprime, 
+            exact H_coprime.right,
+        end,
+    },
+
 end
 
 
