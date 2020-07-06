@@ -255,7 +255,25 @@ begin
         exact mul_pos h2 ihtail,
 
     }
+end
 
+lemma coprime_prod (l :list cong)(c:cong) (H: (∀ (a' : cong), a' ∈ l → c.fst.coprime a'.fst)) : coprime c.fst (cong_prod l):=
+begin
+    induction l with head tail ihtail,
+    {
+        dsimp[cong_prod],
+        by exact c.fst.coprime_one_right,
+    },
+    {
+        dsimp[cong_prod],
+
+       apply nat.coprime.mul_right,
+       exact H head (by exact list.mem_cons_self head tail),
+       apply ihtail,
+       intros a ha,
+       exact H a (by exact list.mem_cons_of_mem head ha),
+    },
+    
 end
 
 --"inductive"
@@ -309,7 +327,11 @@ begin
             end,
         have cop: coprime cong1.1 (cong_prod other_congs),
             begin
-                nat.coprime.mul_right
+                unfold pairwise_coprime at *,
+                rw list.pairwise_cons at H_coprime, 
+
+
+                --nat.coprime.mul_right
             end
 
 
