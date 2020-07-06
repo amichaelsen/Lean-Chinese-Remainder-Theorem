@@ -234,13 +234,35 @@ def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c: cong), 0 < c.1)
 
 def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), modeq c.1 x c.2.val)
 
+def cong_prod :(congruences) → ℕ
+    | list.nil := 1
+    | (h ::t) := h.1*cong_prod t
+ 
+lemma pos_prod (l: congruences) (H:nonzero_cong l) : 0< cong_prod l :=
+begin
+    induction l with head tail ihtail,
+    {
+        dsimp [cong_prod],
+        linarith,
+    },
+    {
+        have h1: nonzero_cong tail,
+            sorry,
+        have h2: 0< head.1,
+            sorry,
+        specialize ihtail h1,
+        dsimp [cong_prod],
+        exact mul_pos h2 ihtail,
+
+    }
+
+end
+
 --"inductive"
 --DEFINE INDUCTIVE STRUCTURE ON LISTS OF CONGRUENCES (base case = 2 congruences)
 
  -- HOW DO BOOLEANS WORK IN LEAN? 
-theorem CRT (l : congruences) (H: pairwise_coprime l) : ∃ x:ℕ list.all l (λ c:cong, modeq c.1 x c.2 ) := 
-begin
-    induction l with nil full,
+ 
 theorem CRT (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
                  ∃ x : ℕ, solution x l := 
 begin
@@ -269,8 +291,31 @@ begin
             rw list.pairwise_cons at H_coprime, 
             exact H_coprime.right,
         end,
+        specialize ind_hyp congs_pairwise_coprime congs_nonzero,
+        have hpos1: 0<cong1.1,
+            unfold nonzero_cong at *,
+            rw list.all_iff_forall_prop at *,
+            have sub_list : cong1 ∈ list.cons cong1 other_congs, 
+            begin
+                by exact list.mem_cons_self cong1 other_congs,
+            end,
+            exact H_nonzero cong1 sub_list,
+        
+        have hpos2: 0<cong_prod other_congs,
+            --base case
+             begin
+               exact pos_prod other_congs congs_nonzero,
+            
+            end,
+        have cop: coprime cong1.1 (cong_prod other_congs),
+            begin
+                nat.coprime.mul_right
+            end
+
+
+
     },
-    
+
 end
 
 
