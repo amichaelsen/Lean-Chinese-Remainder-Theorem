@@ -209,8 +209,9 @@ def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong)
 def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
 
 def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
-
-
+def z : list (Σ (n:ℕ), zmod n) := []
+#reduce list.tail y
+#reduce y.tail
 
 --TOY EXAMPLE 
 
@@ -237,6 +238,66 @@ def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), mode
 def cong_prod :(congruences) → ℕ
     | list.nil := 1
     | (h ::t) := h.1*cong_prod t
+
+def head1' : (congruences) → ℕ 
+    |list.nil :=1
+    | (h::t) := h.1
+
+lemma nonzero_applies_to_head (l :list cong) (h: nonzero_cong l) : 0<head1' l :=
+begin
+    induction l with head tail ihtail,
+    --base case where head of empty list is defined to be 1
+    {
+        dsimp[head1'],
+        linarith,
+    },    
+    --inductive step where head1' is defined the same way as head, maybe we need to prove this at some point
+    {
+        dsimp[head1'],
+        unfold nonzero_cong at *,
+        rw list.all_iff_forall_prop at *,
+        exact h head (by exact list.mem_cons_self head tail),
+    },
+end
+
+lemma nonzero_applies_to_tail (l: list cong) (h: nonzero_cong l) : nonzero_cong l.tail :=
+begin
+    induction l with head tail ihtail,
+    --base case
+    {
+        unfold nonzero_cong at *,
+        dsimp,
+        exact rfl,
+    },
+    --inductive step
+    {
+        --have f1: (head::tail).tail = tail,
+        unfold nonzero_cong at *,
+        rw list.all_iff_forall_prop at *, 
+        intros a ha,
+        have sub_list: a∈ list.cons head tail,
+        dsimp at ha,
+        by exact list.mem_cons_of_mem head ha,
+        exact h a sub_list,
+    },
+end
+
+lemma coprime_applies_to_tail (l:list cong) (h: pairwise_coprime l) : pairwise_coprime l.tail :=
+begin
+    induction l with head tail ihtail,
+    --base case
+    {
+        unfold pairwise_coprime at *,
+        sorry,
+    },
+    --inductive step
+    {
+        unfold pairwise_coprime at *,
+        rw list.pairwise_cons at h, 
+        exact h.right,
+    },
+end
+
  
 lemma pos_prod (l: congruences) (H:nonzero_cong l) : 0< cong_prod l :=
 begin
@@ -247,9 +308,10 @@ begin
     },
     {
         have h1: nonzero_cong tail,
-            sorry,
+            exact nonzero_applies_to_tail (head::tail) H,
         have h2: 0< head.1,
-            sorry,
+            --this lemma with weird def of head works since only applied in the cons case
+            exact nonzero_applies_to_head (head::tail) H,
         specialize ihtail h1,
         dsimp [cong_prod],
         exact mul_pos h2 ihtail,
@@ -273,7 +335,7 @@ begin
        intros a ha,
        exact H a (by exact list.mem_cons_of_mem head ha),
     },
-    
+
 end
 
 --"inductive"
