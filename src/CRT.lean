@@ -235,70 +235,6 @@ def cong_prod :(congruences) → ℕ
 
 /- LEMMAS ABOUT LIST PROPERTIES -/
 
-def head1' : (congruences) → ℕ 
-    |list.nil := 1
-    | (h::t)  := h.1
-
-/- if a list satisfies nonzero_cong, the head has nonzero moduli-/
-lemma nonzero_applies_to_head (l :list cong) (h: nonzero_cong l) : 0<head1' l :=
-begin
-    induction l with head tail ihtail,
-    --base case where head of empty list is defined to be 1
-    {
-        dsimp[head1'],
-        linarith,
-    },    
-    --inductive step where head1' is defined the same way as head, maybe we need to prove this at some point
-    {
-        dsimp[head1'],
-        unfold nonzero_cong at *,
-        rw list.all_iff_forall_prop at *,
-        exact h head (by exact list.mem_cons_self head tail),
-    },
-end
-
-/- if a list satisfies nonzero_cong, so does the tail-/
-lemma nonzero_applies_to_tail (l: list cong) (h: nonzero_cong l) : nonzero_cong l.tail :=
-begin
-    induction l with head tail ihtail,
-    --base case
-    {
-        unfold nonzero_cong at *,
-        dsimp,
-        exact rfl,
-    },
-    --inductive step
-    {
-        --have f1: (head::tail).tail = tail,
-        unfold nonzero_cong at *,
-        rw list.all_iff_forall_prop at *, 
-        intros a ha,
-        have sub_list: a∈ list.cons head tail,
-        dsimp at ha,
-        by exact list.mem_cons_of_mem head ha,
-        exact h a sub_list,
-    },
-end
-
-/- if a list satisfies pairwise_coprime so does the tail-/
-lemma coprime_applies_to_tail (l:list cong) (h: pairwise_coprime l) : pairwise_coprime l.tail :=
-begin
-    induction l with head tail ihtail,
-    --base case
-    {
-        unfold pairwise_coprime at *,
-        sorry,
-    },
-    --inductive step
-    {
-        unfold pairwise_coprime at *,
-        rw list.pairwise_cons at h, 
-        exact h.right,
-    },
-end
-
-/- VERSION 2 OF LEMMAS -/  --These and the ones above are equivalent
-
 /- if a list satisfies nonzero_cong, so does the tail and the head has nonzero moduli-/
 lemma subset_nonzero (c : cong) (l : list cong) (H: nonzero_cong (c :: l)) : 0 < c.1 ∧ nonzero_cong l :=
 begin
@@ -412,54 +348,12 @@ begin
         -- obtain relevant hypothesis for applying CRTwith2exists
         have congs_nonzero := (subset_nonzero cong1 other_congs H_nonzero).right,
         have congs_pairwise_coprime := (subset_coprime cong1 other_congs H_coprime).right,
-        /- THE FOLLOWING ARE RESTATED ABOVE IN ONE LINE EACH USING LEMMAS 
-           have congs_nonzero : nonzero_cong other_congs, 
-            unfold nonzero_cong at *, 
-            rw list.all_iff_forall_prop at *, 
-            intros c hc, 
-            have sub_list : c ∈ list.cons cong1 other_congs, 
-            begin
-                by exact list.mem_cons_of_mem cong1 hc,
-            end,
-            exact H_nonzero c sub_list,
-           have congs_pairwise_coprime : pairwise_coprime other_congs,
-            unfold pairwise_coprime at *,
-            rw list.pairwise_cons at H_coprime, 
-            exact H_coprime.right,
-        -/
         
         have head_pos := (subset_nonzero cong1 other_congs H_nonzero).left,
         have tail_prod_pos := pos_prod other_congs (subset_nonzero cong1 other_congs H_nonzero).right,
-        -- alt version: have head_coprime_to_tail_prod := coprime_prod cong1 other_congs (subset_coprime cong1 other_congs H_coprime).left,
         have head_coprime_to_tail_prod := coprime_prod' cong1 other_congs H_coprime,
 
-        /- THE FOLLOWING ARE RESTATED ABOVE IN ONE LINE EACH USING LEMMAS 
-            have hpos1: 0 < cong1.1,
-            unfold nonzero_cong at *,
-            rw list.all_iff_forall_prop at *,
-            have sub_list : cong1 ∈ list.cons cong1 other_congs, 
-            begin
-                by exact list.mem_cons_self cong1 other_congs,
-            end,
-            exact H_nonzero cong1 sub_list,
-        
-            have hpos2: 0<cong_prod other_congs,
-            --base case
-             begin
-               exact pos_prod other_congs congs_nonzero,
-            
-            end,
-            
-            have cop: coprime cong1.1 (cong_prod other_congs),
-            begin
-                unfold pairwise_coprime at *,
-                rw list.pairwise_cons at H_coprime, 
-
-
-                --nat.coprime.mul_right
-            end
-        -/
-        
+      
         
         -- ------- NEW CODE HERE --------
         --specialize ind_hyp congs_pairwise_coprime congs_nonzero, -- (wrapped into next line)
