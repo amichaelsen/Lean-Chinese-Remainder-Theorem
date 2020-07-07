@@ -197,47 +197,50 @@ end
 
 def cong := (Σ (n:ℕ), zmod n)
 
-def congruences := list cong
-
-def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong), nat.coprime x.1 y.1) l
-
---def nonzero_cong (l : congruences) : Prop := list.all (λ (x:cong), x.1 > 0) l, --need bool form of x.1 > 0
---EXAMPLES
+def congruences := list cong --it doesn't seem to like using this definition 
 
 
-
+-- Examples 
 def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
 
 def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
 
+def y' : congruences := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
 
 
---TOY EXAMPLE 
 
-def nonzero_list (l : list ℕ) : Prop := list.all l (λ n, modeq 10 n 1)
+/- LIST PROPERTY DEFINITIONS-/
+-- A list of congruences must have nonzero and coprime moduli for CRT 
 
-
-lemma test {l : list ℕ} (H : nonzero_list l) : modeq 10 l.head 1 := 
-    begin
-        unfold nonzero_list at H, 
-        rw list.all_iff_forall_prop at H, 
-        specialize H l.head,
-        have k : l.head ∈ l, 
-        begin
-            sorry,
-        end, 
-    end
+/- A list of congruences x ≡ aᵢ mod Mᵢ is  "pairwise_coprime" if
+   every (Mᵢ,Mⱼ)=1 whenever i≠j. -/
+def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong), nat.coprime x.1 y.1) l
 
 
+/- A list of congruences x ≡ aᵢ mod Mᵢ is a "nonzero_cong" if
+   every Mᵢ ≠ 0.  -/
 
 def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c: cong), 0 < c.1)  
 
+
+/- A number x is a solution to a list of congruences l if it 
+   satisfies each congruence relation in the list -/
 def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), modeq c.1 x c.2.val)
 
---"inductive"
---DEFINE INDUCTIVE STRUCTURE ON LISTS OF CONGRUENCES (base case = 2 congruences)
 
- -- HOW DO BOOLEANS WORK IN LEAN? 
+
+/- LEMMAS ABOUT LIST PROPERTIES -/
+
+lemma subset_nonzero (c : cong) (l : congruences) (H: nonzero_cong (c :: l)) : nonzero_cong l ∧ 0 < c.1:=
+begin
+    sorry,
+end 
+
+lemma subset_coprime (c:cong) (l : congruences) (H: pairwise_coprime (c::l)) : 
+
+
+/- CRT: (Existence) Given a list of congruences with coprime and nonzero moduli, 
+        there exists a natural number x that solves every congruence simultaneously -/
 theorem CRT (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
                  ∃ x : ℕ, solution x l := 
 begin
@@ -260,6 +263,7 @@ begin
             end,
             exact H_nonzero c sub_list,
         end,
+        have take2 := subset_nonzero cong1 other_congs H_nonzero,
         have congs_pairwise_coprime : pairwise_coprime other_congs,
         begin
             unfold pairwise_coprime at *,
@@ -271,19 +275,3 @@ begin
 end
 
 
-
-/-
--- how to check all modulus are coprime 
-
---def pairwise_coprime 
-
-#check list.pairwise (λ (x y : ct), nat.coprime x.1 y.1) y 
-
-#check (list.pairwise (≠) [1,2]) 
-
-example {l : list ℕ} (H: list.pairwise (≠) l) : true := 
-begin
-    induction l with a b, 
-    sorry,
-end
--/
