@@ -32,10 +32,10 @@ begin
     ring,
 
     rw mul_assoc at hd,
-    have hd': x.succ*(c*d)=x.succ,
+    have hd' : x.succ * (c * d) = x.succ,
         linarith,
     rw mul_right_eq_self_iff at hd',
-    have h: d=1,
+    have h : d = 1,
         rw mul_eq_one_iff at hd',
         exact hd'.2,
     rw h,
@@ -43,31 +43,20 @@ begin
     exact succ_pos',
 end
 
-/-
-lemma wrapper_for_cast_val {M1 : ℕ} (nonzero: fact (0 < M1)) (b : zmod M1) : ((b.val) : zmod M1) = b :=
-begin
-    exact cast_val b,
-        --rw cast_val ((M2  : zmod M1)⁻¹: zmod M1),
-        --rw ← cast_val ((M2  : zmod M1)⁻¹: zmod M1) at hb1,
-        --rw [← cast_val     ((u * u⁻¹ : units (zmod (n+1)) ) : zmod (n+1))],
-  
-        --rw cast_val ((M2: zmod M1)⁻¹),
-        --exact nonzero, 
-end
--/
 
-lemma nat_inv (M1 M2: ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2): ∃ b1 : ℕ, modeq M1 (b1*M2) 1 := 
+lemma nat_inv (M1 M2 : ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H : coprime M1 M2) :
+                         ∃ b1 : ℕ, modeq M1 (b1 * M2) 1 := 
 begin
     -- first cast to Z/M1 Z and get the group inverse 
-    have hb1 := mul_inv_eq_gcd (M2: zmod M1),  
+    have hb1 := mul_inv_eq_gcd (M2 : zmod M1),  
     have H' := coprime.symm H,
     unfold coprime at *, 
     rw val_cast_nat M2 at hb1, 
 
     have H'' : (M2 % M1).gcd M1 = M2.gcd M1, 
     begin
-        have qr := div_add_mod (M2:ℤ) (M1:ℤ ),
-        have qr':  (M1 * (M2 / M1) + M2 % M1) = M2,
+        have qr  := div_add_mod (M2 : ℤ) (M1 : ℤ ),
+        have qr' : (M1 * (M2 / M1) + M2 % M1) = M2,
             rw ← int.coe_nat_div M2 M1 at qr,
             rw ← int.coe_nat_mod M2 M1 at qr,
             rw ← int.coe_nat_mul _ _ at qr,
@@ -77,20 +66,20 @@ begin
         -- want to show  M2.gcd M1 ∣ (M2 % M1).gcd M1,
         have div1 : M2.gcd M1 ∣ (M2 % M1).gcd M1, 
         begin
-        have f1: M2.gcd M1 ∣ M2 ,
+        have f1 : M2.gcd M1 ∣ M2 ,
             exact gcd_dvd_left M2 M1,
-        have f2: M2.gcd M1 ∣ (M1),
+        have f2 : M2.gcd M1 ∣ M1,
             exact gcd_dvd_right M2 M1,
-        have f3: M2.gcd M1 ∣ M1 *(M2/M1),
+        have f3 : M2.gcd M1 ∣ M1 * (M2 / M1),
             cases f2 with c hc,
-            use c*(M2/M1),
+            use c * (M2 / M1),
             rw ← mul_assoc,
             rw ← hc,
        
-        have f4: M2.gcd M1∣ M1 * (M2 / M1) + M2 % M1,
+        have f4 : M2.gcd M1∣ M1 * (M2 / M1) + M2 % M1,
             rw qr',
             exact f1,
-        rw nat.dvd_add_right (f3) at f4,
+        rw nat.dvd_add_right f3 at f4,
         exact dvd_gcd f4 f2,
         end,
         -- want to show  (M2 % M1).gcd M1 ∣ M2.gcd M1,
@@ -103,7 +92,7 @@ begin
             have f3 : (M2 % M1).gcd M1 ∣ M1 * (M2 / M1),
                 by exact dvd_mul_of_dvd_left f1 (M2 / M1),
             have f4 : (M2 % M1).gcd M1 ∣ M2,
-                have k:= (nat.dvd_add_right f3).2 f2,
+                have k := (nat.dvd_add_right f3).2 f2,
                 rw qr' at k,  
                 exact k, 
             exact dvd_gcd f4 f1,         
@@ -114,17 +103,14 @@ begin
         exact div, 
     end,
     -- use coprimeness and equality of gcd's to get as an actual inverse
-    rw [H'',H'] at hb1, 
-
-    
+    rw [H'',H'] at hb1,     
     use (M2 : zmod M1)⁻¹.val,
     --translate this to zmod M1
     rw ← nat_coe_eq_nat_coe_iff _ _ _, 
-
     simp at *,
     rw mul_comm,
 
-    have fact : (((M2: zmod M1)⁻¹.val) : zmod M1) = (M2: zmod M1)⁻¹,
+    have fact : (((M2 : zmod M1)⁻¹.val) : zmod M1) = (M2 : zmod M1)⁻¹,
     begin
         --exact wrapper_for_cast_val M1pos ((M2: zmod M1)⁻¹ : zmod M1), 
         rw @cast_val _ M1pos ((M2  : zmod M1)⁻¹: zmod M1), --need the '@' to make fact explicity 
@@ -135,7 +121,8 @@ end
 
 
 
-theorem CRTwith2exist (a1 a2 M1 M2: ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2) : ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
+theorem CRTwith2exist (a1 a2 M1 M2 : ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H : coprime M1 M2) :
+                         ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
 begin
     -- get modulo inveres from lemma above
     cases nat_inv M1 M2 M1pos M2pos H with b1 Hb1, 
@@ -171,8 +158,9 @@ begin
     }
 end
 
-theorem CRTwith2unique (x1 x2 a1 a2 M1 M2: ℕ)  (M1pos : 0 < M1) (M2pos : 0 < M2) (H: coprime M1 M2) 
-    (H1: modeq M1 x1 a1 ∧ modeq M2 x1 a2) (H2: modeq M1 x2 a1 ∧ modeq M2 x2 a2): modeq (M1*M2) x1 x2:=
+theorem CRTwith2unique (x1 x2 a1 a2 M1 M2 : ℕ)  (M1pos : 0 < M1) (M2pos : 0 < M2)
+            (H : coprime M1 M2) (H1 : modeq M1 x1 a1 ∧ modeq M2 x1 a2) 
+            (H2 : modeq M1 x2 a1 ∧ modeq M2 x2 a2) : modeq (M1 * M2) x1 x2 :=
 begin
     --cosntruct separate modular equations
     have H3 : x1 ≡ x2 [MOD M1],
@@ -199,14 +187,14 @@ end
 
 --DEFINITIONS 
 
-def cong := (Σ (n:ℕ), zmod n)
+def cong := (Σ (n : ℕ), zmod n)
 
 def congruences := list cong
 
 --Examples 
- def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
- def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
- def z : list (Σ (n:ℕ), zmod n) := []
+ def x : Σ (n : ℕ), zmod n := ⟨5, ↑2⟩
+ def y : list (Σ (n : ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
+ def z : list (Σ (n : ℕ), zmod n) := []
  #reduce list.tail y
  #reduce y.tail
 --end examples
@@ -221,22 +209,22 @@ def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong)
 
 /- all moduli for the congruences in the list are nonzero,
    prevents congruences mod 0, but not mod 1  -/
-def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c: cong), 0 < c.1)  
+def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c : cong), 0 < c.1)  
 
 /-  defines when x is a solution to the list of congruences  in l -/
-def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), modeq c.1 x c.2.val)
+def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c : cong), modeq c.1 x c.2.val)
 
 /- takes the product of the defining moduli of all congruences in the list -/
-def cong_prod :(congruences) → ℕ
+def cong_prod : congruences → ℕ
     | list.nil := 1
-    | (h ::t)  := h.1*cong_prod t
+    | (h :: t) := h.1 * cong_prod t
 
 
 
 /- LEMMAS ABOUT LIST PROPERTIES -/
 
 /- if a list satisfies nonzero_cong, so does the tail and the head has nonzero moduli-/
-lemma subset_nonzero (c : cong) (l : list cong) (H: nonzero_cong (c :: l)) : 0 < c.1 ∧ nonzero_cong l :=
+lemma subset_nonzero (c : cong) (l : list cong) (H : nonzero_cong (c :: l)) : 0 < c.1 ∧ nonzero_cong l :=
 begin
     unfold nonzero_cong at H, 
     rw list.all_iff_forall_prop at H, 
@@ -254,15 +242,15 @@ end
 
 /- if a list satisfies pairwise_coprime the head is coprime to all 
     moduli in the tail and the tail satisfies pairwise_coprime -/
-lemma subset_coprime (c : cong) (l : list cong) (H: pairwise_coprime (c::l)) :
-                     (∀ (a : cong), a ∈ l → coprime c.1 a.1) ∧ pairwise_coprime l:=
+lemma subset_coprime (c : cong) (l : list cong) (H : pairwise_coprime (c :: l)) :
+                     (∀ (a : cong), a ∈ l → coprime c.1 a.1) ∧ pairwise_coprime l :=
 begin
     unfold pairwise_coprime at H,
     rw list.pairwise_cons at H, 
     exact H,
 end
 
-lemma mem_div_prod (l : list cong) (a : cong) (H :a ∈ l) : a.1 ∣ cong_prod l :=
+lemma mem_div_prod (l : list cong) (a : cong) (H : a ∈ l) : a.1 ∣ cong_prod l :=
 begin
     induction l with head tail ihtail,
      --nil case
@@ -277,7 +265,7 @@ begin
     cases ihtail with c hc,
     rw hc,
     rw mul_comm,
-    use c*head.fst,
+    use c * head.fst,
     ring,
 end
  
@@ -286,7 +274,7 @@ end
 
 /- given a list of congruences with nonzero (i.e. positive) 
    moduli, the product of those moduli will be positive -/
-lemma pos_prod (l: congruences) (H:nonzero_cong l) : 0 < cong_prod l :=
+lemma pos_prod (l : congruences) (H : nonzero_cong l) : 0 < cong_prod l :=
 begin
     induction l with head tail ihtail,
     {
@@ -305,7 +293,8 @@ end
 
 /- the modulus of the first congruence is coprime to the product of the moduli of 
     the tail of the list assuming that the entire list satisfies pairwise_coprime-/
-lemma coprime_prod (c : cong) (l : list cong) (H : pairwise_coprime (c::l)) : coprime c.1 (cong_prod l):=
+lemma coprime_prod (c : cong) (l : list cong) (H : pairwise_coprime (c :: l)) :
+                             coprime c.1 (cong_prod l) :=
 begin
     induction l with head tail ihtail,
     {
@@ -328,14 +317,14 @@ end
 
 /- CRT: (Existence) Given a list of congruences with coprime and nonzero moduli, 
         there exists a natural number x that solves every congruence simultaneously -/
-theorem CRT_existence (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
-                 ∃ x : ℕ, solution x l := 
+theorem CRT_existence (l : congruences) (H_coprime : pairwise_coprime l) 
+            (H_nonzero : nonzero_cong l) : ∃ x : ℕ, solution x l := 
 begin
     induction l with cong1 other_congs ind_hyp, 
     { --null cases with empty list, use x=1 since any x is a "solution"
         unfold solution,
         use 1,
-        rw list.all_nil (λ (c:cong), modeq c.1 1 c.2.val),
+        rw list.all_nil (λ (c : cong), modeq c.1 1 c.2.val),
         simp only [bool.coe_sort_tt],        
     },
     {--inductive case
@@ -363,13 +352,13 @@ begin
         rw list.all_iff_forall_prop at hy,
         specialize hy a ha,
         have cong_div := mem_div_prod other_congs a ha,
-        have xymod:= modeq.modeq_of_dvd_of_modeq cong_div hx.2,
+        have xymod    := modeq.modeq_of_dvd_of_modeq cong_div hx.2,
         exact modeq.trans xymod hy,
     },
 end
 
 theorem CRT_uniqueness (x1 x2 : ℕ) (l : congruences) (H_nonzero : nonzero_cong l)
-                        (H_coprime : pairwise_coprime l) (H1 : solution x1 l) (H2: solution x2 l) :
+                        (H_coprime : pairwise_coprime l) (H1 : solution x1 l) (H2 : solution x2 l) :
                              modeq (cong_prod l) x1 x2 :=
 begin
     unfold solution at H1 H2, 
