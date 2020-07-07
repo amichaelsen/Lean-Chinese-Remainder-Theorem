@@ -203,14 +203,13 @@ def cong := (Σ (n:ℕ), zmod n)
 
 def congruences := list cong
 
-
-
 --Examples 
-def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
-def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
-def z : list (Σ (n:ℕ), zmod n) := []
-#reduce list.tail y
-#reduce y.tail
+ def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
+ def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
+ def z : list (Σ (n:ℕ), zmod n) := []
+ #reduce list.tail y
+ #reduce y.tail
+--end examples
 
 
 
@@ -240,6 +239,7 @@ def head1' : (congruences) → ℕ
     |list.nil := 1
     | (h::t)  := h.1
 
+/- if a list satisfies nonzero_cong, the head has nonzero moduli-/
 lemma nonzero_applies_to_head (l :list cong) (h: nonzero_cong l) : 0<head1' l :=
 begin
     induction l with head tail ihtail,
@@ -257,6 +257,7 @@ begin
     },
 end
 
+/- if a list satisfies nonzero_cong, so does the tail-/
 lemma nonzero_applies_to_tail (l: list cong) (h: nonzero_cong l) : nonzero_cong l.tail :=
 begin
     induction l with head tail ihtail,
@@ -279,6 +280,7 @@ begin
     },
 end
 
+/- if a list satisfies pairwise_coprime so does the tail-/
 lemma coprime_applies_to_tail (l:list cong) (h: pairwise_coprime l) : pairwise_coprime l.tail :=
 begin
     induction l with head tail ihtail,
@@ -297,7 +299,7 @@ end
 
 /- VERSION 2 OF LEMMAS -/  --These and the ones above are equivalent
 
-/- if a list satisfies nonzero, so does the tail and the head has nonzero moduli-/
+/- if a list satisfies nonzero_cong, so does the tail and the head has nonzero moduli-/
 lemma subset_nonzero (c : cong) (l : list cong) (H: nonzero_cong (c :: l)) : 0 < c.1 ∧ nonzero_cong l :=
 begin
     unfold nonzero_cong at H, 
@@ -314,8 +316,8 @@ begin
     }
 end 
 
-/- if a list satisfies pairwise coprime the head is coprime to all 
-    moduli in the tail and the tail satisfies pairwise coprime -/
+/- if a list satisfies pairwise_coprime the head is coprime to all 
+    moduli in the tail and the tail satisfies pairwise_coprime -/
 lemma subset_coprime (c : cong) (l : list cong) (H: pairwise_coprime (c::l)) :
                      (∀ (a : cong), a ∈ l → coprime c.1 a.1) ∧ pairwise_coprime l:=
 begin
@@ -327,8 +329,8 @@ end
 
 /-  LEMMAS ABOUT CONG_PROD OUTPUTS -/ 
 
-/- given a list of congruences with nonzero (i.e. positive) moduli, 
-   the product of those moduli will be positive -/
+/- given a list of congruences with nonzero (i.e. positive) 
+   moduli, the product of those moduli will be positive -/
 lemma pos_prod (l: congruences) (H:nonzero_cong l) : 0 < cong_prod l :=
 begin
     induction l with head tail ihtail,
@@ -352,7 +354,7 @@ begin
     }
 end
 
-
+-- duplicated in next lemma as well 
 lemma coprime_prod (c:cong) (l :list cong)  (H: (∀ (a' : cong), a' ∈ l → c.fst.coprime a'.fst)) : coprime c.fst (cong_prod l):=
 begin
     induction l with head tail ihtail,
@@ -395,7 +397,7 @@ end
 
 /- CRT: (Existence) Given a list of congruences with coprime and nonzero moduli, 
         there exists a natural number x that solves every congruence simultaneously -/
-theorem CRT (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
+theorem CRT_existence (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
                  ∃ x : ℕ, solution x l := 
 begin
     induction l with cong1 other_congs ind_hyp, 
@@ -463,9 +465,12 @@ begin
         --specialize ind_hyp congs_pairwise_coprime congs_nonzero, -- (wrapped into next line)
         rcases ind_hyp  congs_pairwise_coprime congs_nonzero with ⟨y, hy⟩, 
         have soln := CRTwith2exist cong1.2.val y cong1.1 (cong_prod other_congs) head_pos tail_prod_pos head_coprime_to_tail_prod,
-
-
+        sorry, 
     },
+end
 
+theorem CRT_uniqueness (x1 x2 : ℕ) (l : congruences) (H1 : solution x1 l) (H2: solution x2 l) : modeq (cong_prod l) x1 x2 :=
+begin
+    sorry, 
 end
 
