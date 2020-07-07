@@ -190,7 +190,11 @@ begin
     exact H, 
 end
 
+
+
+
 --PLAYING WITH DEFINING CONGRUENCES
+
 
 
 --DEFINITIONS 
@@ -199,37 +203,19 @@ def cong := (Σ (n:ℕ), zmod n)
 
 def congruences := list cong
 
-def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong), nat.coprime x.1 y.1) l
-
---def nonzero_cong (l : congruences) : Prop := list.all (λ (x:cong), x.1 > 0) l, --need bool form of x.1 > 0
---EXAMPLES
 
 
-
+--Examples 
 def x : Σ (n:ℕ), zmod n := ⟨5, ↑2⟩
-
 def y : list (Σ (n:ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
 def z : list (Σ (n:ℕ), zmod n) := []
 #reduce list.tail y
 #reduce y.tail
 
---TOY EXAMPLE 
-
-def nonzero_list (l : list ℕ) : Prop := list.all l (λ n, modeq 10 n 1)
 
 
-lemma test {l : list ℕ} (H : nonzero_list l) : modeq 10 l.head 1 := 
-    begin
-        unfold nonzero_list at H, 
-        rw list.all_iff_forall_prop at H, 
-        specialize H l.head,
-        have k : l.head ∈ l, 
-        begin
-            sorry,
-        end, 
-    end
-
-
+/- LIST PROPERTIES -/
+def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong), nat.coprime x.1 y.1) l
 
 def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c: cong), 0 < c.1)  
 
@@ -237,11 +223,16 @@ def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c:cong), mode
 
 def cong_prod :(congruences) → ℕ
     | list.nil := 1
-    | (h ::t) := h.1*cong_prod t
+    | (h ::t)  := h.1*cong_prod t
+
+
+
+/- LEMMAS ABOUT LIST PROPERTIES -/
 
 def head1' : (congruences) → ℕ 
-    |list.nil :=1
-    | (h::t) := h.1
+    |list.nil := 1
+    | (h::t)  := h.1
+
 
 lemma nonzero_applies_to_head (l :list cong) (h: nonzero_cong l) : 0<head1' l :=
 begin
@@ -298,8 +289,35 @@ begin
     },
 end
 
+/- VERSION 2 OF LEMMAS -/  --These and the ones above are equivalent
+
+lemma subset_nonzero (c : cong) (l : list cong) (H: nonzero_cong (c :: l)) : 0 < c.1 ∧ nonzero_cong l :=
+begin
+    unfold nonzero_cong at H, 
+    rw list.all_iff_forall_prop at H, 
+    split, 
+    {
+        exact H c (by exact list.mem_cons_self c l),
+    },
+    {
+        unfold nonzero_cong, 
+        rw list.all_iff_forall_prop,
+        rintros a ha, 
+        exact H a (by exact list.mem_cons_of_mem _ ha),
+    }
+end 
+
+lemma subset_coprime (c : cong) (l : list cong) (H: pairwise_coprime (c::l)) :
+                     (∀ (a : cong), a ∈ l → coprime c.1 a.1) ∧ pairwise_coprime l:=
+begin
+    unfold pairwise_coprime at H,
+    rw list.pairwise_cons at H, 
+    exact H,
+end
  
-lemma pos_prod (l: congruences) (H:nonzero_cong l) : 0< cong_prod l :=
+
+/-  LEMMAS ABOUT CONG_PROD OUTPUTS -/ 
+lemma pos_prod (l: congruences) (H:nonzero_cong l) : 0 < cong_prod l :=
 begin
     induction l with head tail ihtail,
     {
@@ -307,19 +325,21 @@ begin
         linarith,
     },
     {
-        have h1: nonzero_cong tail,
+        have nonzero_parts := subset_nonzero head tail H,
+        /-have h1: nonzero_cong tail,
             exact nonzero_applies_to_tail (head::tail) H,
         have h2: 0< head.1,
             --this lemma with weird def of head works since only applied in the cons case
             exact nonzero_applies_to_head (head::tail) H,
-        specialize ihtail h1,
+        -/
+        specialize ihtail nonzero_parts.right,
         dsimp [cong_prod],
-        exact mul_pos h2 ihtail,
+        exact mul_pos nonzero_parts.left ihtail,
 
     }
 end
 
-lemma coprime_prod (l :list cong)(c:cong) (H: (∀ (a' : cong), a' ∈ l → c.fst.coprime a'.fst)) : coprime c.fst (cong_prod l):=
+lemma coprime_prod (c:cong) (l :list cong)  (H: (∀ (a' : cong), a' ∈ l → c.fst.coprime a'.fst)) : coprime c.fst (cong_prod l):=
 begin
     induction l with head tail ihtail,
     {
@@ -328,21 +348,19 @@ begin
     },
     {
         dsimp[cong_prod],
-
-       apply nat.coprime.mul_right,
-       exact H head (by exact list.mem_cons_self head tail),
-       apply ihtail,
-       intros a ha,
-       exact H a (by exact list.mem_cons_of_mem head ha),
+        apply nat.coprime.mul_right,
+        exact H head (by exact list.mem_cons_self head tail),
+        apply ihtail,
+        intros a ha,
+        exact H a (by exact list.mem_cons_of_mem head ha),
     },
 
 end
 
---"inductive"
---DEFINE INDUCTIVE STRUCTURE ON LISTS OF CONGRUENCES (base case = 2 congruences)
 
- -- HOW DO BOOLEANS WORK IN LEAN? 
- 
+
+/- CRT: (Existence) Given a list of congruences with coprime and nonzero moduli, 
+        there exists a natural number x that solves every congruence simultaneously -/
 theorem CRT (l : congruences) (H_coprime: pairwise_coprime l) (H_nonzero: nonzero_cong l):
                  ∃ x : ℕ, solution x l := 
 begin
@@ -354,7 +372,12 @@ begin
         simp only [bool.coe_sort_tt],        
     },
     {--inductive case
-        have congs_nonzero : nonzero_cong other_congs, 
+        --Want to apply CRTwith2exists by getting facts about congruences for input 
+
+        have congs_nonzero := (subset_nonzero cong1 other_congs H_nonzero).right,
+        have congs_pairwise_coprime := (subset_coprime cong1 other_congs H_coprime).right,
+        --RESTATED ABOVE IN ONE LINE USING LEMMAS 
+        /-have congs_nonzero : nonzero_cong other_congs, 
         begin
             unfold nonzero_cong at *, 
             rw list.all_iff_forall_prop at *, 
@@ -371,8 +394,13 @@ begin
             rw list.pairwise_cons at H_coprime, 
             exact H_coprime.right,
         end,
+        -/
         specialize ind_hyp congs_pairwise_coprime congs_nonzero,
-        have hpos1: 0<cong1.1,
+        
+        have head_pos := (subset_nonzero cong1 other_congs H_nonzero).left,
+        have tail_prod_pos := pos_prod other_congs (subset_nonzero cong1 other_congs H_nonzero).right,
+        have head_coprime_to_tail_prod := coprime_prod cong1 other_congs (subset_coprime cong1 other_congs H_coprime).left,
+        /-have hpos1: 0 < cong1.1,
             unfold nonzero_cong at *,
             rw list.all_iff_forall_prop at *,
             have sub_list : cong1 ∈ list.cons cong1 other_congs, 
@@ -387,6 +415,7 @@ begin
                exact pos_prod other_congs congs_nonzero,
             
             end,
+            
         have cop: coprime cong1.1 (cong_prod other_congs),
             begin
                 unfold pairwise_coprime at *,
@@ -395,7 +424,12 @@ begin
 
                 --nat.coprime.mul_right
             end
-
+        -/
+        
+        
+        -- ------- NEW CODE HERE --------
+        rcases ind_hyp with ⟨y, hy⟩, 
+        have soln := CRTwith2exist cong1.2.val y cong1.1 (cong_prod other_congs) head_pos tail_prod_pos head_coprime_to_tail_prod,
 
 
     },
