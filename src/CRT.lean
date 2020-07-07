@@ -261,6 +261,25 @@ begin
     rw list.pairwise_cons at H, 
     exact H,
 end
+
+lemma mem_div_prod (l : list cong) (a : cong) (H :a ∈ l) : a.1 ∣ cong_prod l :=
+begin
+    induction l with head tail ihtail,
+     --nil case
+    exfalso,
+    exact H,
+    --induction case
+    dsimp[cong_prod],
+    cases H,
+    rw H,
+    simp only [nat.dvd_mul_right],
+    specialize ihtail H,
+    cases ihtail with c hc,
+    rw hc,
+    rw mul_comm,
+    use c*head.fst,
+    ring,
+end
  
 
 /-  LEMMAS ABOUT CONG_PROD OUTPUTS -/ 
@@ -359,12 +378,25 @@ begin
         --specialize ind_hyp congs_pairwise_coprime congs_nonzero, -- (wrapped into next line)
         rcases ind_hyp  congs_pairwise_coprime congs_nonzero with ⟨y, hy⟩, 
         have soln := CRTwith2exist cong1.2.val y cong1.1 (cong_prod other_congs) head_pos tail_prod_pos head_coprime_to_tail_prod,
-        sorry, 
+        cases soln with x hx,
+        use x,
+        unfold solution,
+        rw list.all_iff_forall_prop,
+        intros a ha,
+        cases ha,
+        rw ha,
+        exact hx.left,
+        unfold solution at hy,
+        rw list.all_iff_forall_prop at hy,
+        specialize hy a ha,
+        have cong_div := mem_div_prod other_congs a ha,
+        have xymod:= modeq.modeq_of_dvd_of_modeq cong_div hx.2,
+        exact modeq.trans xymod hy,
     },
 end
 
 theorem CRT_uniqueness (x1 x2 : ℕ) (l : congruences) (H1 : solution x1 l) (H2: solution x2 l) : modeq (cong_prod l) x1 x2 :=
 begin
-    sorry, 
+    
 end
 
