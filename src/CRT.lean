@@ -295,41 +295,17 @@ begin
     },
     {
         have nonzero_parts := subset_nonzero head tail H,
-        /-
-            have h1: nonzero_cong tail,
-            exact nonzero_applies_to_tail (head::tail) H,
-            have h2: 0< head.1,
-            --this lemma with weird def of head works since only applied in the cons case
-            exact nonzero_applies_to_head (head::tail) H,
-        -/
         specialize ihtail nonzero_parts.right,
         dsimp [cong_prod],
         exact mul_pos nonzero_parts.left ihtail,
-
     }
 end
 
--- duplicated in next lemma as well 
-lemma coprime_prod (c:cong) (l :list cong)  (H: (∀ (a' : cong), a' ∈ l → c.fst.coprime a'.fst)) : coprime c.fst (cong_prod l):=
-begin
-    induction l with head tail ihtail,
-    {
-        dsimp[cong_prod],
-        by exact c.fst.coprime_one_right,
-    },
-    {
-        dsimp[cong_prod],
-        apply nat.coprime.mul_right,
-        exact H head (by exact list.mem_cons_self head tail),
-        apply ihtail,
-        intros a ha,
-        exact H a (by exact list.mem_cons_of_mem head ha),
-    },
 
-end
 
---slightly longer but the statement header is cleaner and matches other headers 
-lemma coprime_prod' (c : cong) (l : list cong) (H : pairwise_coprime (c::l)) : coprime c.1 (cong_prod l):=
+/- the modulus of the first congruence is coprime to the product of the moduli of 
+    the tail of the list assuming that the entire list satisfies pairwise_coprime-/
+lemma coprime_prod (c : cong) (l : list cong) (H : pairwise_coprime (c::l)) : coprime c.1 (cong_prod l):=
 begin
     induction l with head tail ihtail,
     {
@@ -370,11 +346,8 @@ begin
         
         have head_pos := (subset_nonzero cong1 other_congs H_nonzero).left,
         have tail_prod_pos := pos_prod other_congs (subset_nonzero cong1 other_congs H_nonzero).right,
-        have head_coprime_to_tail_prod := coprime_prod' cong1 other_congs H_coprime,
-
+        have head_coprime_to_tail_prod := coprime_prod cong1 other_congs H_coprime,
       
-        
-        -- ------- NEW CODE HERE --------
         --specialize ind_hyp congs_pairwise_coprime congs_nonzero, -- (wrapped into next line)
         rcases ind_hyp  congs_pairwise_coprime congs_nonzero with ⟨y, hy⟩, 
         have soln := CRTwith2exist cong1.2.val y cong1.1 (cong_prod other_congs) head_pos tail_prod_pos head_coprime_to_tail_prod,
@@ -395,8 +368,39 @@ begin
     },
 end
 
-theorem CRT_uniqueness (x1 x2 : ℕ) (l : congruences) (H1 : solution x1 l) (H2: solution x2 l) : modeq (cong_prod l) x1 x2 :=
+theorem CRT_uniqueness (x1 x2 : ℕ) (l : congruences) (H_nonzero : nonzero_cong l)
+                        (H_coprime : pairwise_coprime l) (H1 : solution x1 l) (H2: solution x2 l) :
+                             modeq (cong_prod l) x1 x2 :=
 begin
-    
+    unfold solution at H1 H2, 
+    rw list.all_iff_forall_prop at H1 H2, 
+    induction l with head tail ihtail, 
+    --list.nil case
+    dsimp [cong_prod], 
+    rw modeq.modeq_iff_dvd,
+    simp only [one_dvd, int.coe_nat_zero, int.coe_nat_succ, zero_add],
+
+    --induction case 
+    dsimp [cong_prod],
+    have h1 : x1 ≡ x2 [MOD head.1], 
+    begin
+        have k1 := H1 head (by exact list.mem_cons_self head tail), 
+        have k2 := modeq.symm (H2 head (by exact list.mem_cons_self head tail)), 
+        exact modeq.trans k1 k2, 
+    end,
+    have h2 : x1 ≡ x2 [MOD cong_prod tail], 
+    begin
+        apply ihtail, 
+        exact (subset_nonzero head tail H_nonzero).right,
+        exact (subset_coprime head tail H_coprime).right,
+        intros a ha, 
+        exact H2 a (by exact list.mem_cons_of_mem head ha),
+        intros a ha, 
+        exact H1 a (by exact list.mem_cons_of_mem head ha),        
+    end,
+    have coprime :=  coprime_prod head tail H_coprime,
+    rw ← modeq.modeq_and_modeq_iff_modeq_mul, 
+    exact ⟨h1, h2⟩, 
+    exact coprime, 
 end
 
