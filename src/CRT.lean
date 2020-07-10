@@ -8,10 +8,11 @@ import data.int.basic
 
 open nat nat.modeq zmod euclidean_domain 
 
+/- CHINESE REMAINDER THEOREM WITH 2 CONGRUENCE RELATIONS -/
 
-
--- CRT with 2 congruence statements
-
+/--
+Two natural numbers are equal if and only if they are mutual divisors
+-/
 lemma eq_iff_dvd_dvd {n m : ℕ } : n = m  ↔ m ∣ n ∧ n ∣ m :=
 begin
     split, 
@@ -19,11 +20,9 @@ begin
     rw H, 
     split; 
     refl,
-
+ 
     intro H,
-    cases H with H1 H2,
-    cases H1 with c hc,
-    cases H2 with d hd,
+    rcases H with ⟨⟨c, hc⟩, ⟨d, hd⟩⟩, 
     rw hd,
     rw hc at hd,
     induction m with x hx,  
@@ -44,6 +43,10 @@ begin
 end
 
 
+/-- 
+Given coprime natural numbers M1 M2, find the inverse of M2 M1 
+assuming that both are nonzero so avoid (1,0) case which is silly. 
+-/
 lemma nat_inv (M1 M2 : ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H : coprime M1 M2) :
                          ∃ b1 : ℕ, modeq M1 (b1 * M2) 1 := 
 begin
@@ -57,30 +60,31 @@ begin
     begin
         have qr  := div_add_mod (M2 : ℤ) (M1 : ℤ ),
         have qr' : (M1 * (M2 / M1) + M2 % M1) = M2,
-            rw ← int.coe_nat_div M2 M1 at qr,
-            rw ← int.coe_nat_mod M2 M1 at qr,
-            rw ← int.coe_nat_mul _ _ at qr,
-            rw ← int.coe_nat_add _ _ at qr,
-            rw int.coe_nat_inj' at qr,
-            exact qr,
+            begin
+                rw ← int.coe_nat_div M2 M1 at qr,
+                rw ← int.coe_nat_mod M2 M1 at qr,
+                rw ← int.coe_nat_mul _ _ at qr,
+                rw ← int.coe_nat_add _ _ at qr,
+                rw int.coe_nat_inj' at qr,
+                exact qr,
+            end,
         -- want to show  M2.gcd M1 ∣ (M2 % M1).gcd M1,
         have div1 : M2.gcd M1 ∣ (M2 % M1).gcd M1, 
-        begin
-        have f1 : M2.gcd M1 ∣ M2 ,
-            exact gcd_dvd_left M2 M1,
-        have f2 : M2.gcd M1 ∣ M1,
-            exact gcd_dvd_right M2 M1,
-        have f3 : M2.gcd M1 ∣ M1 * (M2 / M1),
-            cases f2 with c hc,
-            use c * (M2 / M1),
-            rw ← mul_assoc,
-            rw ← hc,
-       
-        have f4 : M2.gcd M1∣ M1 * (M2 / M1) + M2 % M1,
-            rw qr',
-            exact f1,
-        rw nat.dvd_add_right f3 at f4,
-        exact dvd_gcd f4 f2,
+        begin   
+            have f1 : M2.gcd M1 ∣ M2 ,
+                {exact gcd_dvd_left M2 M1,},
+            have f2 : M2.gcd M1 ∣ M1,
+                {exact gcd_dvd_right M2 M1,},
+            have f3 : M2.gcd M1 ∣ M1 * (M2 / M1),
+                {cases f2 with c hc,
+                use c * (M2 / M1),
+                rw ← mul_assoc,
+                rw ← hc,},
+            have f4 : M2.gcd M1∣ M1 * (M2 / M1) + M2 % M1,
+                {rw qr',
+                exact f1,},
+            rw nat.dvd_add_right f3 at f4,
+            exact dvd_gcd f4 f2,
         end,
         -- want to show  (M2 % M1).gcd M1 ∣ M2.gcd M1,
         have div2 : (M2 % M1).gcd M1 ∣ M2.gcd M1, 
@@ -120,7 +124,10 @@ begin
 end  
 
 
-
+/-- 
+Given two solutions to a pair of congruence relations modulo M1 M2,
+coprime nonzero numbers, these will be congruent modulo M1*M2 
+-/
 theorem CRTwith2exist (a1 a2 M1 M2 : ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H : coprime M1 M2) :
                          ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
 begin
@@ -130,7 +137,7 @@ begin
     --solution x = a1 b1 m2 + a2 b1 m2 
     use (a1*b1*M2 + a2*b2*M1),
     split,  
-    {
+    {   --show this is a solution mod M1
         rw ← add_zero a1, --conv {to_rhs, skip, rw ← add_zero a1}, --applies to just what we see as RHS
         apply modeq_add,
         simp only [add_zero],
@@ -143,7 +150,7 @@ begin
         rw modeq_iff_dvd,
         simp only [dvd_mul_left, zero_sub, int.coe_nat_zero, dvd_neg, int.coe_nat_mul], 
     },
-    {
+    {   --show this is a solution mod M2
         rw ← zero_add a2, 
         apply modeq_add, 
         rw modeq_iff_dvd,
@@ -162,15 +169,9 @@ theorem CRTwith2unique (x1 x2 a1 a2 M1 M2 : ℕ)  (M1pos : 0 < M1) (M2pos : 0 < 
             (H : coprime M1 M2) (H1 : modeq M1 x1 a1 ∧ modeq M2 x1 a2) 
             (H2 : modeq M1 x2 a1 ∧ modeq M2 x2 a2) : modeq (M1 * M2) x1 x2 :=
 begin
-    --cosntruct separate modular equations
-    have H3 : x1 ≡ x2 [MOD M1],
-    begin
-        exact modeq.trans H1.left (modeq.symm H2.left),
-    end,
-    have H4 : x1 ≡ x2 [MOD M2],
-    begin
-        exact modeq.trans H1.right (modeq.symm H2.right),
-    end,
+    --cosntruct separate modular equations x1 = x2 mod Mi 
+    have H3 := modeq.trans H1.left (modeq.symm H2.left),
+    have H4 := modeq.trans H1.right (modeq.symm H2.right),
 
     -- combine modular equations using coprime
     rw ← modeq_and_modeq_iff_modeq_mul, 
@@ -181,50 +182,60 @@ end
 
 
 
---PLAYING WITH DEFINING CONGRUENCES
+/- DEFINITIONS -/
 
-
-
---DEFINITIONS 
-
+/--
+A structure for a congruence relation with a 
+modulus n and an equivalence in zmod n
+-/
 def cong := (Σ (n : ℕ), zmod n)
 
+/--
+A list of congruence relations 
+-/
 def congruences := list cong
 
---Examples 
+/-Examples of above definitions 
  def x : Σ (n : ℕ), zmod n := ⟨5, ↑2⟩
  def y : list (Σ (n : ℕ), zmod n) := [⟨5, ↑2⟩ , ⟨3, ↑2⟩]
  def z : list (Σ (n : ℕ), zmod n) := []
- #reduce list.tail y
- #reduce y.tail
---end examples
+-/
 
 
 
 /- LIST PROPERTIES -/
 
-/- all moduli for the congruences in the list are pairwise coprime
-   required for application of chinese remainder theorem -/
+/--
+All moduli for the congruences in the list are pairwise coprime 
+-/
 def pairwise_coprime  (l : congruences) : Prop := list.pairwise (λ (x y : cong), nat.coprime x.1 y.1) l
 
-/- all moduli for the congruences in the list are nonzero,
-   prevents congruences mod 0, but not mod 1  -/
+/--
+All moduli for the congruences in the list are nonzero 
+-/
 def nonzero_cong ( l : congruences) : Prop := list.all l (λ (c : cong), 0 < c.1)  
 
-/-  defines when x is a solution to the list of congruences  in l -/
+/--
+Defines when x is a solution to the list of congruences in l 
+-/
 def solution (x : ℕ) (l : congruences) : Prop := list.all l (λ (c : cong), modeq c.1 x c.2.val)
 
-/- takes the product of the defining moduli of all congruences in the list -/
+/--
+Takes the product of the defining moduli of all congruences in the list 
+-/
 def cong_prod : congruences → ℕ
     | list.nil := 1
     | (h :: t) := h.1 * cong_prod t
-
+--
 
 
 /- LEMMAS ABOUT LIST PROPERTIES -/
 
-/- if a list satisfies nonzero_cong, so does the tail and the head has nonzero moduli-/
-lemma subset_nonzero (c : cong) (l : list cong) (H : nonzero_cong (c :: l)) : 0 < c.1 ∧ nonzero_cong l :=
+/-- 
+If a list satisfies nonzero_cong, so does the tail and the head has nonzero moduli
+-/
+lemma subset_nonzero (c : cong) (l : list cong) (H : nonzero_cong (c :: l)) :
+                                 0 < c.1 ∧ nonzero_cong l :=
 begin
     unfold nonzero_cong at H, 
     rw list.all_iff_forall_prop at H, 
@@ -240,8 +251,10 @@ begin
     }
 end 
 
-/- if a list satisfies pairwise_coprime the head is coprime to all 
-    moduli in the tail and the tail satisfies pairwise_coprime -/
+/--
+If a list satisfies pairwise_coprime the head is coprime to all 
+moduli in the tail and the tail satisfies pairwise_coprime 
+-/
 lemma subset_coprime (c : cong) (l : list cong) (H : pairwise_coprime (c :: l)) :
                      (∀ (a : cong), a ∈ l → coprime c.1 a.1) ∧ pairwise_coprime l :=
 begin
@@ -250,6 +263,10 @@ begin
     exact H,
 end
 
+/--
+The modulus for an element of list of congruences will divide the 
+cong_prod of the list, the product of all moduli in the list 
+-/
 lemma mem_div_prod (l : list cong) (a : cong) (H : a ∈ l) : a.1 ∣ cong_prod l :=
 begin
     induction l with head tail ihtail,
@@ -272,8 +289,10 @@ end
 
 /-  LEMMAS ABOUT CONG_PROD OUTPUTS -/ 
 
-/- given a list of congruences with nonzero (i.e. positive) 
-   moduli, the product of those moduli will be positive -/
+/--
+ Given a list of congruences with nonzero (i.e. positive) 
+   moduli, the product of those moduli will be positive 
+-/
 lemma pos_prod (l : congruences) (H : nonzero_cong l) : 0 < cong_prod l :=
 begin
     induction l with head tail ihtail,
@@ -290,9 +309,10 @@ begin
 end
 
 
-
-/- the modulus of the first congruence is coprime to the product of the moduli of 
-    the tail of the list assuming that the entire list satisfies pairwise_coprime-/
+/--
+The modulus of the first congruence is coprime to the product of the moduli of 
+the tail of the list assuming that the entire list satisfies pairwise_coprime
+-/
 lemma coprime_prod (c : cong) (l : list cong) (H : pairwise_coprime (c :: l)) :
                              coprime c.1 (cong_prod l) :=
 begin
@@ -315,8 +335,14 @@ begin
     },
 end 
 
-/- CRT: (Existence) Given a list of congruences with coprime and nonzero moduli, 
-        there exists a natural number x that solves every congruence simultaneously -/
+/- THE STATEMENT & PROOFS FOR GENERAL CRT WITH CONGRUENCE -/
+
+
+
+/-- 
+CRT: (Existence) Given a list of congruences with coprime and nonzero moduli, 
+there exists a natural number x that solves every congruence simultaneously 
+-/
 theorem CRT_existence (l : congruences) (H_coprime : pairwise_coprime l) 
             (H_nonzero : nonzero_cong l) : ∃ x : ℕ, solution x l := 
 begin
@@ -357,6 +383,10 @@ begin
     },
 end
 
+/-- 
+CRT: (Uniqueness) Given a list of congruences with coprime and nonzero moduli, 
+any two solutions will be congruent modulo the cong_prod of the list  
+-/
 theorem CRT_uniqueness (x1 x2 : ℕ) (l : congruences) (H_nonzero : nonzero_cong l)
                         (H_coprime : pairwise_coprime l) (H1 : solution x1 l) (H2 : solution x2 l) :
                              modeq (cong_prod l) x1 x2 :=
