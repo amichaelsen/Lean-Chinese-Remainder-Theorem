@@ -418,4 +418,3 @@ begin
     exact ⟨h1, h2⟩, 
     exact coprime, 
 end
-
