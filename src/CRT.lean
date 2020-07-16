@@ -122,11 +122,10 @@ begin
 end  
 
 /-- 
-Given two solutions to a pair of congruence relations modulo M1 M2,
-coprime nonzero numbers, these will be congruent modulo M1*M2 
+Given two coprime moduli M1 and M2 (nonzero) and natural numbers a1 and a1,
+there is a natural number x such that x ≡ a1 [MOD M1]  and  x ≡ a2 [MOD M2]. 
 -/
-theorem CRTwith2exist (a1 a2 M1 M2 : ℕ ) (M1pos : 0 < M1)
-                      (M2pos : 0 < M2) (H : coprime M1 M2) :
+theorem CRTwith2exist (a1 a2 M1 M2 : ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H : coprime M1 M2) :
                          ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 :=
 begin
     -- get modulo inveres from lemma above
