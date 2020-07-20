@@ -438,3 +438,156 @@ begin
 
 
 end
+
+
+
+theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
+  (zmod n)×(zmod m) ≃+* (zmod (n*m)) := 
+begin  
+    -- defining a CRT lift (zmod n)×(zmod m) → (zmod (n*m))
+    -- which satisfies the desired congruences
+    have choice : ∀ (xy : (zmod n)×(zmod m)),
+     ∃ ( XY : (zmod (n*m)) ), modeq n XY.val xy.fst.val ∧ modeq m XY.val xy.snd.val,
+    begin
+        intro xy, 
+        have CRT := CRTwith2exist xy.1.val xy.2.val n m n_pos m_pos H_cop,
+        choose x Hx using CRT,
+        use x, 
+        split, 
+        {
+            sorry, 
+        },
+        {
+            sorry, 
+        }
+    end,
+    choose f Hf using choice, 
+    use f,
+    intro x, 
+    use (x,x), 
+    intro y,
+    ext, 
+    {   simp, 
+        have thing1 : ((f y) :zmod n) = (((f y):zmod n).val : zmod n), by sorry, 
+        have thing2 : ((y.fst).val : zmod n) = y.fst, by sorry, 
+        rw [thing1, ← thing2],  
+        rw nat_coe_eq_nat_coe_iff _ _ _,
+        specialize Hf y, 
+        have thing3 : ((f y):zmod n).val = (f y).val, by sorry, 
+        rw thing3, 
+        exact Hf.left,        
+    },
+    {   simp, 
+        have thing1 : ((f y) :zmod m) = (((f y):zmod m).val : zmod m), by sorry, 
+        have thing2 : ((y.snd).val : zmod m) = y.snd, by sorry, 
+        rw [thing1, ← thing2],  
+        rw nat_coe_eq_nat_coe_iff _ _ _,
+        specialize Hf y, 
+        have thing3 : ((f y):zmod m).val = (f y).val, by sorry, 
+        rw thing3, 
+        exact Hf.right,         
+    },
+    {
+        intro y, 
+        rw modular_equivalence, 
+        apply CRTwith2unique _ _ y.val y.val,  
+        simpa, simpa, 
+        exact H_cop, 
+        specialize Hf (((y:zmod n),(y:zmod m))),  
+        {
+            split, 
+            have Hf' := Hf.left, 
+            simp at *, 
+            have this : (y : zmod n).val ≡ y.val [MOD n], by sorry, 
+            exact modeq.trans Hf' this, 
+
+            have Hf' := Hf.right, 
+            simp at *, 
+            have this : (y : zmod m).val ≡ y.val [MOD m], by sorry, 
+            exact modeq.trans Hf' this,             
+        },
+        split; refl,
+    },
+
+    --multiplicative hom 
+    {
+        intros x y, 
+        rw modular_equivalence, 
+        rw ← modeq_and_modeq_iff_modeq_mul H_cop,
+        split, 
+        {
+            have Hx := (Hf x).left, 
+            have Hy := (Hf y).left, 
+            have Hxy := (Hf (x*y)).left,  
+            have step1 : ((f x)*(f y)).val ≡  (x.fst.val*y.fst.val) [MOD n] := 
+            begin
+                sorry,
+            end,
+            have step2 : (f (x*y)).val ≡  (x.fst.val*y.fst.val) [MOD n] := 
+            begin
+                apply modeq.trans Hxy, 
+                rw prod.fst_mul x y,
+                rw val_mul, 
+                exact modeq.mod_modeq (x.fst.val * y.fst.val) n,
+            end,
+            exact modeq.trans step2 (modeq.symm step1),             
+        },
+        {
+            have Hx := (Hf x).right, 
+            have Hy := (Hf y).right, 
+            have Hxy := (Hf (x*y)).right,  
+            have step1 : ((f x)*(f y)).val ≡  (x.snd.val*y.snd.val) [MOD m] := 
+            begin
+                sorry,
+            end,
+            have step2 : (f (x*y)).val ≡  (x.snd.val*y.snd.val) [MOD m] := 
+            begin
+                apply modeq.trans Hxy, 
+                rw prod.snd_mul x y,
+                rw val_mul, 
+                exact modeq.mod_modeq (x.snd.val * y.snd.val) m,
+            end,
+            exact modeq.trans step2 (modeq.symm step1),             
+        },
+    },
+
+    --additive hom 
+    intros x y, 
+    rw modular_equivalence, 
+    rw ← modeq_and_modeq_iff_modeq_mul H_cop,
+    split, 
+    {
+        have Hx := (Hf x).left, 
+        have Hy := (Hf y).left, 
+        have Hxy := (Hf (x+y)).left,  
+        have step1 : ((f x)+(f y)).val ≡  (x.fst.val+y.fst.val) [MOD n] := 
+        begin
+            sorry,
+        end,
+        have step2 : (f (x+y)).val ≡  (x.fst.val+y.fst.val) [MOD n] := 
+        begin
+            apply modeq.trans Hxy, 
+            rw prod.fst_add x y,
+            rw val_add, 
+            exact modeq.mod_modeq (x.fst.val + y.fst.val) n,
+        end,
+        exact modeq.trans step2 (modeq.symm step1),             
+    },
+    {
+            have Hx := (Hf x).right, 
+            have Hy := (Hf y).right, 
+            have Hxy := (Hf (x+y)).right,  
+            have step1 : ((f x)+(f y)).val ≡  (x.snd.val+y.snd.val) [MOD m] := 
+            begin
+                sorry,
+            end,
+            have step2 : (f (x+y)).val ≡  (x.snd.val+y.snd.val) [MOD m] := 
+            begin
+                apply modeq.trans Hxy, 
+                rw prod.snd_add x y,
+                rw val_add, 
+                exact modeq.mod_modeq (x.snd.val + y.snd.val) m,
+            end,
+            exact modeq.trans step2 (modeq.symm step1),             
+    },
+end
