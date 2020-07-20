@@ -440,6 +440,11 @@ begin
 end
 
 
+lemma modular_equivalence {n : ℕ} {a b : zmod n} : (a : zmod n) = (b : zmod n) ↔  a.val ≡ b.val [MOD n] :=
+begin
+    sorry,
+end
+
 
 theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
   (zmod n)×(zmod m) ≃+* (zmod (n*m)) := 
