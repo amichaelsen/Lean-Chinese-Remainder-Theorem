@@ -442,9 +442,35 @@ end
 
 lemma modular_equivalence {n : ℕ} {a b : zmod n} : (a : zmod n) = (b : zmod n) ↔  a.val ≡ b.val [MOD n] :=
 begin
-    sorry,
+    
 end
 
+theorem CRTisowith2' {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
+ (zmod (n*m)) ≃+* (zmod n)×(zmod m) := 
+begin 
+    use (λ a, (a,a)),
+    have choice : ∀ (xy : (zmod n)×(zmod m)),
+     ∃ ( XY : (zmod (n*m)) ), modeq n XY.val xy.fst.val ∧ modeq m XY.val xy.snd.val,
+    begin
+        intro xy, 
+        have CRT := CRTwith2exist xy.1.val xy.2.val n m n_pos m_pos H_cop,
+        choose x Hx using CRT,
+        use x, 
+        split, 
+        {
+            sorry, 
+        },
+        {
+            sorry, 
+        }
+    end,
+    choose f Hf using choice, 
+    use f,
+    intro y,
+    simp,
+    unfold_coes,
+    dsimp at *,
+end
 
 theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
   (zmod n)×(zmod m) ≃+* (zmod (n*m)) := 
@@ -526,7 +552,8 @@ begin
             have Hxy := (Hf (x*y)).left,  
             have step1 : ((f x)*(f y)).val ≡  (x.fst.val*y.fst.val) [MOD n] := 
             begin
-                sorry,
+                rw ← val_mul x.fst y.fst,
+
             end,
             have step2 : (f (x*y)).val ≡  (x.fst.val*y.fst.val) [MOD n] := 
             begin
@@ -573,7 +600,7 @@ begin
         begin
             apply modeq.trans Hxy, 
             rw prod.fst_add x y,
-            rw val_add, 
+            rw @val_add n n_pos, 
             exact modeq.mod_modeq (x.fst.val + y.fst.val) n,
         end,
         exact modeq.trans step2 (modeq.symm step1),             
@@ -590,7 +617,7 @@ begin
             begin
                 apply modeq.trans Hxy, 
                 rw prod.snd_add x y,
-                rw val_add, 
+                rw @val_add n n_pos, 
                 exact modeq.mod_modeq (x.snd.val + y.snd.val) m,
             end,
             exact modeq.trans step2 (modeq.symm step1),             
