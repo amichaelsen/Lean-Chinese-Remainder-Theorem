@@ -417,3 +417,23 @@ begin
     exact ⟨h1, h2⟩, 
     exact coprime, 
 end
+
+-------------------------ISOMORPHISM VERSION--------------------------
+
+
+def proj (n: ℕ) (m: ℕ) : zmod (n*m) → (zmod n) × (zmod m):=
+begin
+    intro a,
+    use (a,a),
+end
+
+def proj' (n:ℕ ) (m : ℕ): (λ a: zmod (n*m), ((a : zmod n), (a:zmod m)),
+
+#reduce  λ a: zmod (24), ((a: zmod 3),(a : zmod 8))
+
+theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
+begin
+    use proj n m,
+
+
+end
