@@ -5,7 +5,7 @@ import data.zmod.basic
 import tactic
 import algebra.euclidean_domain
 import data.int.basic
-
+import data.equiv.ring
 
 open nat nat.modeq zmod euclidean_domain 
 
@@ -434,6 +434,7 @@ def proj' (n:ℕ ) (m : ℕ): (λ a: zmod (n*m), ((a : zmod n), (a:zmod m)),
 theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
 begin
     use proj n m,
+    intro a,
 
 
 end
