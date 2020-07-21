@@ -429,27 +429,59 @@ end
 
 def proj' (n:ℕ ) (m : ℕ): (λ a: zmod (n*m), ((a : zmod n), (a:zmod m)),
 
-#reduce  λ a: zmod (24), ((a: zmod 3),(a : zmod 8))
+
 
 theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
 begin
     use proj n m,
     intro a,
+    sorry,
 
+end
 
+lemma casting1 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) : 
+    ((f y) :zmod n) = (((f y):zmod n).val : zmod n):=
+begin
+    rw @cast_val _  n_pos (f y),
+end
+
+lemma casting2 {n m : ℕ } {H_cop: coprime n m} {n_pos : 0 < n} {m_pos : 0 < m} (y: zmod n × zmod m) : 
+    ((y.fst).val : zmod n) = y.fst ∧ ((y.snd).val : zmod m) = y.snd:=
+begin
+    split,
+    rw @cast_val _ n_pos y.fst,
+    rw @cast_val _ m_pos y.snd,
+end
+
+lemma casting3 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) :
+    ((f y):zmod n).val = (f y).val:=
+begin
+    sorry,
 end
 
 
 lemma modular_equivalence {n : ℕ} {a b : zmod n} : (a : zmod n) = (b : zmod n) ↔  a.val ≡ b.val [MOD n] :=
 begin
-    
+    sorry,
 end
 
 theorem CRTisowith2' {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
  (zmod (n*m)) ≃+* (zmod n)×(zmod m) := 
 begin 
     use (λ a, (a,a)),
-    have choice : ∀ (xy : (zmod n)×(zmod m)),
+    intro xy,
+    have inv1 := nat_inv n m n_pos m_pos H_cop,
+    have inv2 := nat_inv m n m_pos n_pos (coprime.symm H_cop),
+    /-  why doesn't this work??
+    cases inv1 with b1 Hb1,
+    cases inv2 with b2 Hb2,
+    -/
+    --exact xy.fst * cases inv1* m + xy.snd* cases inv2* n,
+    sorry,
+
+
+    
+    /-have choice : ∀ (xy : (zmod n)×(zmod m)),
      ∃ ( XY : (zmod (n*m)) ), modeq n XY.val xy.fst.val ∧ modeq m XY.val xy.snd.val,
     begin
         intro xy, 
@@ -458,7 +490,8 @@ begin
         use x, 
         split, 
         {
-            sorry, 
+            --rw modular_equivalence,
+            sorry,
         },
         {
             sorry, 
@@ -467,10 +500,18 @@ begin
     choose f Hf using choice, 
     use f,
     intro y,
-    simp,
-    unfold_coes,
-    dsimp at *,
+    -/
+    
+    /-have := nat_inv n m n_pos m_pos H_cop,
+    cases this, 
+    have := nat_inv n m n_pos m_pos (coprime.symm H_cop),
+    cases this with b2 Hb2, 
+    --solution x = a1 b1 m2 + a2 b1 m2 
+    use (λ (a1,a2), (a1*b1*m + a2*b2*n)),
+    -/
 end
+
+
 
 theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
   (zmod n)×(zmod m) ≃+* (zmod (n*m)) := 
