@@ -472,14 +472,20 @@ begin
     intro xy,
     have inv1 := nat_inv n m n_pos m_pos H_cop,
     have inv2 := nat_inv m n m_pos n_pos (coprime.symm H_cop),
-    /-  why doesn't this work??
-    cases inv1 with b1 Hb1,
-    cases inv2 with b2 Hb2,
-    -/
-    --exact xy.fst * cases inv1* m + xy.snd* cases inv2* n,
-    sorry,
-
-
+    --  why doesn't this work??
+    choose b1 Hb1 using inv1,
+    choose b2 Hb2 using inv2,
+    exact xy.fst * b1* m + xy.snd* b2* n,
+    intro y,
+    simp,
+    cases CRTwith2exist ((y: zmod n).val) ((y: zmod m).val) n m (n_pos) (m_pos) (H_cop) with x hx,
+    have hyn: y.val ≡ (y: zmod n).val [MOD n] ∧ y.val ≡ ((y: zmod m).val) [MOD m],
+        begin
+            sorry,
+        end 
+    
+    
+    
     
     /-have choice : ∀ (xy : (zmod n)×(zmod m)),
      ∃ ( XY : (zmod (n*m)) ), modeq n XY.val xy.fst.val ∧ modeq m XY.val xy.snd.val,
@@ -509,6 +515,24 @@ begin
     --solution x = a1 b1 m2 + a2 b1 m2 
     use (λ (a1,a2), (a1*b1*m + a2*b2*n)),
     -/
+end
+
+theorem CRTmul_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
+   : ∀ (x y : zmod (n*m)), f (x * y) = f x * f y:=
+begin
+    intros x y,
+    have Hx := H x,
+    have Hy := H y,
+    have Hxy := H (x*y),
+    rw Hx,
+    rw Hy,
+    rw Hxy,
+    ext,
+    {
+        simp,
+        unfold_coes,
+        sorry,
+    }
 end
 
 
@@ -545,9 +569,8 @@ begin
         rw [thing1, ← thing2],  
         rw nat_coe_eq_nat_coe_iff _ _ _,
         specialize Hf y, 
-        have thing3 : ((f y):zmod n).val = (f y).val, by sorry, 
-        rw thing3, 
-        exact Hf.left,        
+        have thing3 : (((f y):zmod n).val) ≡ ((f y).val) [MOD n], by sorry, 
+        exact modeq.trans thing3 Hf.left,       
     },
     {   simp, 
         have thing1 : ((f y) :zmod m) = (((f y):zmod m).val : zmod m), by sorry, 
