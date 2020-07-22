@@ -517,6 +517,30 @@ begin
     -/
 end
 
+--PLAYING AROUND WITH CLASSICAL.SOME AND .SOME_SPEC 
+theorem isomorphism_test_classical {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
+ (zmod (n*m)) ≃+* (zmod n)×(zmod m) := 
+begin 
+    --define function and its inverse
+    use (λ a, (a,a)),
+    intro xy, 
+    have CRT := CRTwith2exist xy.fst.val xy.snd.val n m n_pos m_pos H_cop,
+    set k := classical.some CRT with H, 
+    have k' := classical.some_spec CRT, 
+    use (k : zmod (n*m) ), 
+
+    --show these are inverses using classical.some_spec
+    {
+        intro y, 
+        dsimp,
+        rw modular_equivalence, 
+        rw ← modeq.modeq_and_modeq_iff_modeq_mul H_cop,
+        have k' := classical.some_spec (CRTwith2exist (y:zmod n).val (y : zmod n).val n m n_pos m_pos H_cop),
+        sorry, 
+    },
+    sorry,sorry,sorry, 
+end
+
 theorem CRTmul_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
    : ∀ (x y : zmod (n*m)), f (x * y) = f x * f y:=
 begin
