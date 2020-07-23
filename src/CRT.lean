@@ -6,6 +6,7 @@ import tactic
 import algebra.euclidean_domain
 import data.int.basic
 import data.equiv.ring
+noncomputable theory
 
 open nat nat.modeq zmod euclidean_domain 
 
@@ -427,7 +428,7 @@ begin
     use (a,a),
 end
 
-def proj' (n:ℕ ) (m : ℕ): (λ a: zmod (n*m), ((a : zmod n), (a:zmod m)),
+--def proj' (n:ℕ ) (m : ℕ) : (λ (a: zmod (n*m) ), ( (a : zmod n), (a:zmod m) ))
 
 
 
@@ -436,7 +437,10 @@ begin
     use proj n m,
     intro a,
     sorry,
-
+    sorry,
+    sorry,
+    sorry,
+    sorry,
 end
 
 lemma casting1 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) : 
@@ -482,11 +486,7 @@ begin
     have hyn: y.val ≡ (y: zmod n).val [MOD n] ∧ y.val ≡ ((y: zmod m).val) [MOD m],
         begin
             sorry,
-        end 
-    
-    
-    
-    
+        end,   
     /-have choice : ∀ (xy : (zmod n)×(zmod m)),
      ∃ ( XY : (zmod (n*m)) ), modeq n XY.val xy.fst.val ∧ modeq m XY.val xy.snd.val,
     begin
@@ -515,6 +515,10 @@ begin
     --solution x = a1 b1 m2 + a2 b1 m2 
     use (λ (a1,a2), (a1*b1*m + a2*b2*n)),
     -/
+    sorry,
+    sorry,
+    sorry, 
+    sorry, 
 end
 
 --PLAYING AROUND WITH CLASSICAL.SOME AND .SOME_SPEC 
@@ -538,7 +542,7 @@ begin
         have k' := classical.some_spec (CRTwith2exist (y:zmod n).val (y : zmod n).val n m n_pos m_pos H_cop),
         sorry, 
     },
-    sorry,sorry,sorry, 
+    sorry,sorry,sorry,
 end
 
 theorem CRTmul_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
@@ -556,7 +560,8 @@ begin
         simp,
         unfold_coes,
         sorry,
-    }
+    },
+    sorry,
 end
 
 
