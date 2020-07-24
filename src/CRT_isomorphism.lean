@@ -23,18 +23,6 @@ end
 --def proj' (n:ℕ ) (m : ℕ) : (λ (a: zmod (n*m) ), ( (a : zmod n), (a:zmod m) ))
 
 
-
-theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
-begin
-    use proj n m,
-    intro a,
-    sorry,
-    sorry,
-    sorry,
-    sorry,
-    sorry,
-end
-
 lemma casting1 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) : 
     ((f y) :zmod n) = (((f y):zmod n).val : zmod n):=
 begin
@@ -62,35 +50,24 @@ begin
     sorry,
 end
 
-theorem CRTisowith2' {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
- (zmod (n*m)) ≃+* (zmod n)×(zmod m) := 
-begin 
-    use (λ a, (a,a)),
-    intro xy,
-    have inv1 := nat_inv n m n_pos m_pos H_cop,
-    have inv2 := nat_inv m n m_pos n_pos (coprime.symm H_cop),
-    --  why doesn't this work??
-    choose b1 Hb1 using inv1,
-    choose b2 Hb2 using inv2,
-    exact xy.fst * b1* m + xy.snd* b2* n,
-    intro y,
-    simp,
-    cases CRTwith2exist ((y: zmod n).val) ((y: zmod m).val) n m (n_pos) (m_pos) (H_cop) with x hx,
-    have hyn: y.val ≡ (y: zmod n).val [MOD n] ∧ y.val ≡ ((y: zmod m).val) [MOD m],
-        begin
-            sorry,
-        end,   
-    /-have choice : ∀ (xy : (zmod n)×(zmod m)),
+def K {n m :ℕ} {x : zmod n}{y : zmod m} {XY : zmod (n*m) } : Prop := 
+XY.val ≡ (proj n m y).fst.val [MOD n]                                         ∧ XY.val ≡ (proj n m y).snd.val [MOD m], 
+
+
+theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
+begin
+    --define maps 
+    use proj n m,
+    have choice : ∀ (xy : (zmod n)×(zmod m)),
      ∃ ( XY : (zmod (n*m)) ), modeq n XY.val xy.fst.val ∧ modeq m XY.val xy.snd.val,
     begin
         intro xy, 
-        have CRT := CRTwith2exist xy.1.val xy.2.val n m n_pos m_pos H_cop,
+        have CRT := CRTwith2exist xy.1.val xy.2.val n m npos mpos H,
         choose x Hx using CRT,
         use x, 
         split, 
         {
-            --rw modular_equivalence,
-            sorry,
+            sorry, 
         },
         {
             sorry, 
@@ -98,9 +75,55 @@ begin
     end,
     choose f Hf using choice, 
     use f,
-    intro y,
-    -/
+
+    -- show inverses (needs classical.some)
+    {
+        simp,
+        intro y,
+        simp,
+        rw modular_equivalence, 
+        rw ← modeq_and_modeq_iff_modeq_mul H, 
+        split, 
+        have k : y.val ≡ (proj n m y).fst.val [MOD n], 
+            sorry,
+        apply modeq.trans _ (modeq.symm k), 
+        have CRT := CRTwith2exist (proj n m y).fst.val (proj n m y).snd.val n m npos mpos H,
+        have k' := classical.some_spec CRT, 
+        have k'_spec := (classical.some_spec CRT).left,
+        sorry,  
+    },
+    { 
+        simp,
+        intro xy, 
+        simp,
+        sorry, 
+    }, 
+    sorry,
+    sorry,
+end
+
+-- VERSION 2 which runs into classical.some 
+theorem CRTisowith2' {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
+ (zmod (n*m)) ≃+* (zmod n)×(zmod m) := 
+begin 
+    use (λ a, (a,a)),
+    intro xy,
+    have inv1 := nat_inv n m n_pos m_pos H_cop,
+    have inv2 := nat_inv m n m_pos n_pos (coprime.symm H_cop),
+    choose b1 Hb1 using inv1,
+    choose b2 Hb2 using inv2,
+    exact xy.fst * b1* m + xy.snd* b2* n,
     
+    --show inverses 
+    {
+    intro y,
+    simp,
+    cases CRTwith2exist ((y: zmod n).val) ((y: zmod m).val) n m (n_pos) (m_pos) (H_cop) with x hx,
+    have hyn: y.val ≡ (y: zmod n).val [MOD n] ∧ y.val ≡ ((y: zmod m).val) [MOD m],
+        begin
+            sorry,
+        end,
+    },       
     /-have := nat_inv n m n_pos m_pos H_cop,
     cases this, 
     have := nat_inv n m n_pos m_pos (coprime.symm H_cop),
@@ -114,6 +137,11 @@ begin
     sorry, 
 end
 
+
+
+lemma mini {n m: ℕ} (c : ℕ) (y : zmod (n*m) ) : c ≡ (y : zmod n).val [MOD n] → 
+                                                (c : zmod (n*m) ).val  ≡ y.val [MOD n] := sorry
+
 --PLAYING AROUND WITH CLASSICAL.SOME AND .SOME_SPEC 
 theorem isomorphism_test_classical {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
  (zmod (n*m)) ≃+* (zmod n)×(zmod m) := 
@@ -122,7 +150,7 @@ begin
     use (λ a, (a,a)),
     intro xy, 
     have CRT := CRTwith2exist xy.fst.val xy.snd.val n m n_pos m_pos H_cop,
-    set k := classical.some CRT with H, 
+    set k := classical.some CRT with H,
     have k' := classical.some_spec CRT, 
     use (k : zmod (n*m) ), 
 
@@ -133,6 +161,10 @@ begin
         rw modular_equivalence, 
         rw ← modeq.modeq_and_modeq_iff_modeq_mul H_cop,
         have k' := classical.some_spec (CRTwith2exist (y:zmod n).val (y : zmod n).val n m n_pos m_pos H_cop),
+        split, 
+        have k1 := k'.left, 
+        exact mini _ _ k1,  
+        
         sorry, 
     },
     sorry,sorry,sorry,
@@ -171,8 +203,6 @@ begin
 
 end 
 
-
-
 theorem CRTmul_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
    : ∀ (x y : zmod (n*m)), f (x * y) = f x * f y:=
 begin
@@ -192,7 +222,7 @@ begin
 end
 
 
-
+-- VERSION 1, avoids classical.some but hard to show hom properties 
 theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
   (zmod n)×(zmod m) ≃+* (zmod (n*m)) := 
 begin  
@@ -218,6 +248,8 @@ begin
     intro x, 
     use (x,x), 
     intro y,
+
+    -- show inverses 
     ext, 
     {   simp, 
         have thing1 : ((f y) :zmod n) = (((f y):zmod n).val : zmod n), by sorry, 
