@@ -454,9 +454,10 @@ begin
 end
 
 lemma casting3 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) :
-    ((f y):zmod n).val = (f y).val:=
+    (((f y):zmod n).val) ≡ ((f y).val) [MOD n]:=
 begin
     sorry,
+
 end
 
 
@@ -541,6 +542,41 @@ begin
     sorry,sorry,sorry, 
 end
 
+--lemma to use for final step of add/mul homomorphisms.
+lemma casting4 {n m: ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) ( x y : zmod (n*m)):
+    ((x: zmod n)+ (y : zmod n)).val= ((x + y) : zmod n).val :=
+begin
+    exact rfl,
+end
+
+theorem CRTadd_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
+   : ∀ (x y : zmod (n*m)), f (x + y) = f x + f y:=
+begin
+    intros x y,
+    have Hx := H x,
+    have Hy := H y,
+    have Hxy := H (x+y),
+    rw Hx,
+    rw Hy,
+    rw Hxy,
+    ext,
+        simp,
+        have add : (x : zmod n) + (y : zmod n) = ((x + y) : zmod n),
+        refl,
+        rw modular_equivalence,
+        have nm_pos: 0<n*m,
+            exact mul_pos n_pos m_pos,
+        rw ← casting4 H_cop n_pos m_pos x y,
+        sorry,
+
+        simp,
+        sorry,
+                
+
+end 
+
+
+
 theorem CRTmul_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
    : ∀ (x y : zmod (n*m)), f (x * y) = f x * f y:=
 begin
@@ -552,11 +588,11 @@ begin
     rw Hy,
     rw Hxy,
     ext,
-    {
         simp,
-        unfold_coes,
         sorry,
-    }
+
+        simp,
+        sorry,  
 end
 
 
@@ -602,9 +638,8 @@ begin
         rw [thing1, ← thing2],  
         rw nat_coe_eq_nat_coe_iff _ _ _,
         specialize Hf y, 
-        have thing3 : ((f y):zmod m).val = (f y).val, by sorry, 
-        rw thing3, 
-        exact Hf.right,         
+        have thing3 : ((f y):zmod m).val ≡ (f y).val [MOD m], by sorry, 
+        exact modeq.trans thing3 Hf.right,         
     },
     {
         intro y, 
