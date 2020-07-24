@@ -50,11 +50,29 @@ begin
     sorry,
 end
 
-def K {n m :ℕ} {x : zmod n}{y : zmod m} {XY : zmod (n*m) } : Prop := 
-XY.val ≡ (proj n m y).fst.val [MOD n]                                         ∧ XY.val ≡ (proj n m y).snd.val [MOD m], 
 
 
 theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
+begin
+    --define maps 
+    use (λ x, (x, x)),
+    intro xy, 
+    have CRT := CRTwith2exist xy.1.val xy.2.val n m npos mpos H, 
+    /-theorem CRTwith2exist (a1 a2 M1 M2 : ℕ ) (M1pos : 0 < M1) (M2pos : 0 < M2) (H : coprime M1 M2) :
+                         ∃ x : ℕ , modeq M1 x a1 ∧ modeq M2 x a2 -/
+    choose x Hx using CRT, 
+    use x, 
+
+    -- show inverses (needs classical.some)
+    {
+        intro y,
+        simp,
+        -- Goal here: ⊢ ↑(classical.some _) = y
+    },
+    --show other proprties...
+end
+
+theorem CRTwith2' (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
 begin
     --define maps 
     use proj n m,
@@ -67,7 +85,7 @@ begin
         use x, 
         split, 
         {
-            sorry, 
+             sorry,
         },
         {
             sorry, 
@@ -160,11 +178,11 @@ begin
         dsimp,
         rw modular_equivalence, 
         rw ← modeq.modeq_and_modeq_iff_modeq_mul H_cop,
-        have k' := classical.some_spec (CRTwith2exist (y:zmod n).val (y : zmod n).val n m n_pos m_pos H_cop),
+        have CRT := CRTwith2exist (y:zmod n).val (y : zmod n).val n m n_pos m_pos H_cop,
+        set k := classical.some CRT with H,
+        have k' := classical.some_spec CRT,
         split, 
-        have k1 := k'.left, 
-        exact mini _ _ k1,  
-        
+        have k1' := mini _ _ k'.left,
         sorry, 
     },
     sorry,sorry,sorry,
@@ -220,7 +238,6 @@ begin
         simp,
         sorry,  
 end
-
 
 -- VERSION 1, avoids classical.some but hard to show hom properties 
 theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
