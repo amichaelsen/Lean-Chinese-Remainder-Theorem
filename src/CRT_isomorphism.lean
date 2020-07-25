@@ -9,7 +9,7 @@ import data.int.basic
 import data.equiv.ring
 noncomputable theory
 
-open nat nat.modeq zmod  CRT
+open nat nat.modeq zmod CRT
 
 -------------------------ISOMORPHISM VERSION--------------------------
 
