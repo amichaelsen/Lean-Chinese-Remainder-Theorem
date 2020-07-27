@@ -44,11 +44,30 @@ begin
 
 end
 
+--lemma to use for final step of add/mul homomorphisms.
+lemma casting4 {n m: ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) ( x y : zmod (n*m)):
+    ((x: zmod n)+ (y : zmod n)).val= ((x + y) : zmod n).val :=
+begin
+    exact rfl,
+end
+
+
+lemma casting5 {n m : ℕ} (x : ℕ) : ((x : zmod (n*m)) : zmod n) = (x : zmod n) ∧ ((x : zmod (n*m)) : zmod m) = (x : zmod m):=
+begin
+    sorry,
+end 
+
+
 
 lemma modular_equivalence {n : ℕ} {a b : zmod n} : (a : zmod n) = (b : zmod n) ↔  a.val ≡ b.val [MOD n] :=
 begin
     sorry,
 end
+
+lemma modular_equivalence_nat {n: ℕ} {a b : ℕ} : (a : zmod n) = (b : zmod n) ↔  a ≡ b [MOD n] :=
+begin
+    sorry,
+end 
 
 def K {n m :ℕ} {x : zmod n}{y : zmod m} {XY : zmod (n*m) } : Prop := 
 XY.val ≡ (proj n m y).fst.val [MOD n]                                         ∧ XY.val ≡ (proj n m y).snd.val [MOD m], 
@@ -85,13 +104,27 @@ begin
         have CRT := CRTwith2exist xy.1.val xy.2.val n m npos mpos H,
         choose x Hx using CRT,
         use x, 
+        have : 0<n*m,
+        finish,
         split, 
         {
-            sorry, 
+            have key : (x: zmod (n*m)).val ≡  x [MOD n],
+            {
+                rw ← @modular_equivalence_nat _ (x: zmod (n*m)).val x,
+                rw @nat_cast_val _ _ _ this x,
+                rw (casting5 x).left,
+            },
+            exact modeq.trans key Hx.left,
         },
-        {
-            sorry, 
-        }
+        {            
+            have key : (x: zmod (n*m)).val ≡  x [MOD m],
+            {
+                rw ← @modular_equivalence_nat _ (x: zmod (n*m)).val x,
+                rw @nat_cast_val _ _ _ this x,
+                rw (casting5 x).right,
+            },
+            exact modeq.trans key Hx.right, 
+        },
     end,
     choose f Hf using choice, 
     use f,
@@ -190,12 +223,6 @@ begin
     sorry,sorry,sorry,
 end
 
---lemma to use for final step of add/mul homomorphisms.
-lemma casting4 {n m: ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) ( x y : zmod (n*m)):
-    ((x: zmod n)+ (y : zmod n)).val= ((x + y) : zmod n).val :=
-begin
-    exact rfl,
-end
 
 theorem CRTadd_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
    : ∀ (x y : zmod (n*m)), f (x + y) = f x + f y:=
