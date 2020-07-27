@@ -209,18 +209,9 @@ begin
     rw Hxy,
     ext,
         simp,
-        have add : (x : zmod n) + (y : zmod n) = ((x + y) : zmod n),
-        refl,
-        rw modular_equivalence,
-        have nm_pos: 0<n*m,
-            exact mul_pos n_pos m_pos,
-        rw ← casting4 H_cop n_pos m_pos x y,
-        sorry,
-
+        rw @zmod.cast_add (n*m) (zmod n) _ n _ (show n ∣ n*m, by exact dvd.intro m rfl)  _ _, 
         simp,
-        sorry,
-                
-
+        rw @zmod.cast_add (n*m) (zmod m) _ m _ (show m ∣ n*m, by exact dvd_mul_left m n) _ _,
 end 
 
 theorem CRTmul_hom {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) (f : zmod (n*m)→ (zmod n × zmod m)) (H : ∀ xy: zmod (n*m), f(xy)=(xy,xy))
@@ -235,11 +226,10 @@ begin
     rw Hxy,
     ext,
         simp,
-        sorry,
-
+        rw @zmod.cast_mul (n*m) (zmod n) _ n _ (show n ∣ n*m, by exact dvd.intro m rfl)  _ _, 
         simp,
-        sorry,  
-end
+        rw @zmod.cast_mul (n*m) (zmod m) _ m _ (show m ∣ n*m, by exact dvd_mul_left m n) _ _,
+end 
 
 -- VERSION 1, avoids classical.some but hard to show hom properties 
 theorem CRTisowith2 {n m : ℕ} (H_cop: coprime n m ) (n_pos : 0 < n) (m_pos : 0 < m) :
