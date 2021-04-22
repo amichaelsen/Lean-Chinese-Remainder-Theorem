@@ -1,4 +1,4 @@
-import CRT 
+import CRT2 CRT lemmas2 defs_lemmas
 import data.nat.basic
 import data.nat.modeq
 import data.nat.gcd
@@ -9,7 +9,7 @@ import data.int.basic
 import data.equiv.ring
 noncomputable theory
 
-open nat nat.modeq zmod CRT
+open nat nat.modeq zmod CRT2 CRT lemmas2 defs_lemmas
 
 -------------------------ISOMORPHISM VERSION--------------------------
 
@@ -26,15 +26,18 @@ end
 lemma casting1 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) : 
     ((f y) :zmod n) = (((f y):zmod n).val : zmod n):=
 begin
-    rw @cast_val _  n_pos (f y),
+    sorry, -- cast_val deprication issues
+    --rw @cast_val _  n_pos (f y),
 end
 
 lemma casting2 {n m : ℕ } {H_cop: coprime n m} {n_pos : 0 < n} {m_pos : 0 < m} (y: zmod n × zmod m) : 
     ((y.fst).val : zmod n) = y.fst ∧ ((y.snd).val : zmod m) = y.snd:=
 begin
     split,
-    rw @cast_val _ n_pos y.fst,
-    rw @cast_val _ m_pos y.snd,
+    sorry, -- cast_val deprication issues
+    --rw @cast_val _ n_pos y.fst,
+    sorry, -- cast_val deprication issues
+    --rw @cast_val _ m_pos y.snd,
 end
 
 lemma casting3 {n m : ℕ } {H_cop: coprime n m } {n_pos : 0 < n} {m_pos : 0 < m} (f: zmod n × zmod m → zmod (n*m)) (y: zmod n × zmod m) :
@@ -69,8 +72,11 @@ begin
     sorry,
 end 
 
-def K {n m :ℕ} {x : zmod n}{y : zmod m} {XY : zmod (n*m) } : Prop := 
-XY.val ≡ (proj n m y).fst.val [MOD n]                                         ∧ XY.val ≡ (proj n m y).snd.val [MOD m], 
+-- def K {n m :ℕ} {x : zmod n}{y : zmod m} {XY : zmod (n*m) } : Prop := 
+-- XY.val ≡ (proj n m y).fst.val [MOD n] ∧ XY.val ≡ (proj n m y).snd.val [MOD m],
+-- begin
+--     sorry,
+-- end
 
 
 theorem CRTwith2 (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
@@ -89,8 +95,10 @@ begin
         intro y,
         simp,
         -- Goal here: ⊢ ↑(classical.some _) = y
+        sorry,
     },
     --show other proprties...
+    sorry, sorry, sorry, 
 end
 
 theorem CRTwith2' (n m : ℕ) (H: coprime n m) (npos: n > 0) (mpos: m > 0)  : zmod (n*m) ≃+* zmod n × zmod m :=
@@ -111,8 +119,9 @@ begin
             have key : (x: zmod (n*m)).val ≡  x [MOD n],
             {
                 rw ← @modular_equivalence_nat _ (x: zmod (n*m)).val x,
-                rw @nat_cast_val _ _ _ this x,
-                rw (casting5 x).left,
+                sorry, -- nat_cast_val 'fact' issues
+                -- rw @nat_cast_val _ _ _ this x,
+                --rw (casting5 x).left,
             },
             exact modeq.trans key Hx.left,
         },
@@ -120,8 +129,9 @@ begin
             have key : (x: zmod (n*m)).val ≡  x [MOD m],
             {
                 rw ← @modular_equivalence_nat _ (x: zmod (n*m)).val x,
-                rw @nat_cast_val _ _ _ this x,
-                rw (casting5 x).right,
+                sorry, -- nat_cast_val 'fact' issues
+                -- rw @nat_cast_val _ _ _ this x,
+                --rw (casting5 x).right,
             },
             exact modeq.trans key Hx.right, 
         },
@@ -144,6 +154,7 @@ begin
         have k' := classical.some_spec CRT, 
         have k'_spec := (classical.some_spec CRT).left,
         sorry,  
+        sorry,
     },
     { 
         simp,
@@ -176,6 +187,7 @@ begin
         begin
             sorry,
         end,
+        sorry,
     },       
     /-have := nat_inv n m n_pos m_pos H_cop,
     cases this, 
@@ -186,8 +198,7 @@ begin
     -/
     sorry,
     sorry,
-    sorry, 
-    sorry, 
+    sorry,  
 end
 
 
@@ -216,8 +227,8 @@ begin
         have k' := classical.some_spec (CRTwith2exist (y:zmod n).val (y : zmod n).val n m n_pos m_pos H_cop),
         split, 
         have k1 := k'.left, 
-        exact mini _ _ k1,  
-        
+        sorry,
+        --exact mini _ _ k1,  
         sorry, 
     },
     sorry,sorry,sorry,
@@ -339,7 +350,8 @@ begin
             have Hxy := (Hf (x*y)).left,  
             have step1 : ((f x)*(f y)).val ≡  (x.fst.val*y.fst.val) [MOD n] := 
             begin
-                rw ← val_mul x.fst y.fst,
+                sorry,
+                --rw ← val_mul x.fst y.fst,
 
             end,
             have step2 : (f (x*y)).val ≡  (x.fst.val*y.fst.val) [MOD n] := 
@@ -387,8 +399,9 @@ begin
         begin
             apply modeq.trans Hxy, 
             rw prod.fst_add x y,
-            rw @val_add n n_pos, 
-            exact modeq.mod_modeq (x.fst.val + y.fst.val) n,
+            sorry, -- added 'fact' issues
+            -- rw @val_add n n_pos, 
+            --exact modeq.mod_modeq (x.fst.val + y.fst.val) n,
         end,
         exact modeq.trans step2 (modeq.symm step1),             
     },
@@ -404,8 +417,9 @@ begin
             begin
                 apply modeq.trans Hxy, 
                 rw prod.snd_add x y,
-                rw @val_add n n_pos, 
-                exact modeq.mod_modeq (x.snd.val + y.snd.val) m,
+                sorry, -- 'fact' issues added
+                --rw @val_add n n_pos, 
+                --exact modeq.mod_modeq (x.snd.val + y.snd.val) m,
             end,
             exact modeq.trans step2 (modeq.symm step1),             
     },
