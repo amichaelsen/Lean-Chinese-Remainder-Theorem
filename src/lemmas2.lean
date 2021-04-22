@@ -9,7 +9,7 @@ import data.equiv.ring
 noncomputable theory
 
 open nat nat.modeq zmod euclidean_domain 
-namespace lemmas
+namespace lemmas2
 
 /- LEMMAS FOR CHINESE REMAINDER THEOREM WITH 2 CONGRUENCE RELATIONS -/
 
@@ -125,6 +125,6 @@ end
 /- LEMMAS FOR CHINESE REMAINDER THEOREM WITH K CONGRUENCE RELATIONS -/
 
 
-end lemmas
+end lemmas2
 
 
