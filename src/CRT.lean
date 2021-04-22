@@ -38,7 +38,7 @@ begin
         linarith,
     rw mul_right_eq_self_iff at hd',
     have h : d = 1,
-        rw mul_eq_one_iff at hd',
+        rw nat.mul_eq_one_iff at hd',
         exact hd'.2,
     rw h,
     ring,
@@ -56,7 +56,7 @@ begin
     have hb1 := mul_inv_eq_gcd (M2 : zmod M1),  
     have H' := coprime.symm H,
     unfold coprime at *, 
-    rw val_cast_nat M2 at hb1, 
+    rw val_nat_cast M2 at hb1, 
 
     have H'' : (M2 % M1).gcd M1 = M2.gcd M1, 
     begin
@@ -115,7 +115,8 @@ begin
 
     have fact : (((M2 : zmod M1)⁻¹.val) : zmod M1) = (M2 : zmod M1)⁻¹,
     begin
-        rw @cast_val _ M1pos ((M2  : zmod M1)⁻¹: zmod M1), --need the '@' to make [fact] explicity 
+        sorry, -- method cast_val deprecated in mathlib revisions
+        --rw @cast_val _ M1pos ((M2  : zmod M1)⁻¹: zmod M1), --need the '@' to make [fact] explicity 
     end,
     rw fact,
     exact hb1, 
