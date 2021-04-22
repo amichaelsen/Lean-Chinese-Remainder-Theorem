@@ -1,6 +1,6 @@
 # Lean
 
-This project was a collaboration with Rose Lopez as part of the UC Berkeley Summer 2020 [Lean Seminar](https://sites.google.com/view/berkeleyleanseminar). 
+This project was a collaboration with [Rose Lopez](https://github.com/Roseele) as part of the UC Berkeley Summer 2020 [Lean Seminar](https://sites.google.com/view/berkeleyleanseminar). 
 
 Lean is a theorem proving programming language where lemmas and theorems are formalized in the header and the function code uses ```tactics``` and prior results to check the desired conclusion. To learn more check out the Lean Community page [here](https://leanprover-community.github.io/index.html) or get started on the Natural Numbers Game Tutorial [here](https://wwwf.imperial.ac.uk/~buzzard/xena/natural_number_game/). 
 
