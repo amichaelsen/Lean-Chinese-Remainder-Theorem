@@ -34,7 +34,7 @@ While the Lean mathlib library has an implementation for the Lite version of CRT
 
 ### **Supporting Files**
 
-**```lemmas2.lean```** - derives helpful lemmas for the proof of CRT2.  **Note:** This file contains 1 ```sorry``` due to updates in the ```zmod/basics.lean``` file from the mathlib directory added after the completion of this project.
+**```lemmas2.lean```** - derives helpful lemmas for the proof of CRT2.  **Note:** 
 
 **```defs_lemmas.lean```** - develops definitions for lists of congruences and proves lemmas about these to help handle the data of arbitrary lists of congruences for the full **Chinese Remainder Theorem** 
 

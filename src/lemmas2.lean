@@ -115,7 +115,6 @@ begin
 
     have fact : (((M2 : zmod M1)⁻¹.val) : zmod M1) = (M2 : zmod M1)⁻¹,
     begin
-        --sorry, -- method cast_val deprecated in mathlib revisions
         rw @nat_cast_zmod_val _ _,
         use M1pos,
     end,
