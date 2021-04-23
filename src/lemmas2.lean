@@ -115,8 +115,9 @@ begin
 
     have fact : (((M2 : zmod M1)⁻¹.val) : zmod M1) = (M2 : zmod M1)⁻¹,
     begin
-        sorry, -- method cast_val deprecated in mathlib revisions
-        --rw @cast_val _ M1pos ((M2  : zmod M1)⁻¹: zmod M1), --need the '@' to make [fact] explicity 
+        --sorry, -- method cast_val deprecated in mathlib revisions
+        rw @nat_cast_zmod_val _ _,
+        use M1pos,
     end,
     rw fact,
     exact hb1, 
